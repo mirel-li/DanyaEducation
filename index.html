@@ -286,29 +286,28 @@
     display:block;
   }
 
-  .lecture-entry{
+  .day-cell.selected{
+    box-shadow: 0 0 0 2px var(--accent, var(--ink));
+  }
+
+  .lecture-editor{
     background: #fff;
     border: 1px solid var(--line);
     border-radius: 10px;
     padding: 10px 10px 8px;
-    margin-top: 10px;
-    position: relative;
+    margin-top: 12px;
   }
-  .lecture-entry .remove-btn{
-    position:absolute;
-    top: 8px; right: 8px;
+  .lecture-editor-head{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
   }
-  .add-btn{
-    font-family: var(--font-body);
-    font-size: 13.5px;
-    font-weight: 600;
-    color: var(--c-lek);
-    background: var(--c-lek-bg);
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    margin-top: 10px;
-    cursor: pointer;
+  .lecture-editor-day{
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 14px;
   }
   .remove-btn{
     font-family: var(--font-body);
@@ -408,15 +407,23 @@
   <div id="subjectsContainer"></div>
 
   <h2 class="section-title">Лекции</h2>
-  <p class="section-hint">Отмечай дни, когда была лекция, и записывай темы и мысли ниже.</p>
+  <p class="section-hint">Нажми на день — откроется место для темы лекции и мыслей по ней.</p>
   <div class="subject-card" id="lecturesCard" style="--accent: var(--c-lek);">
     <div class="subject-head">
       <span class="subject-name">Лекции</span>
       <span class="subject-count" id="lekCount"></span>
     </div>
     <div class="strip" id="lekStrip"></div>
-    <div id="lecturesList"></div>
-    <button class="add-btn" id="addLectureBtn">+ Добавить запись о лекции</button>
+    <div id="lectureEditor" class="lecture-editor" style="display:none;">
+      <div class="lecture-editor-head">
+        <span class="lecture-editor-day" id="lectureEditorDay"></span>
+        <button type="button" class="remove-btn" id="lectureDeleteBtn">Удалить запись</button>
+      </div>
+      <label class="field-label" for="lectureTitleInput">Тема лекции</label>
+      <input type="text" id="lectureTitleInput" placeholder="О чём была лекция">
+      <label class="field-label" for="lectureThoughtsInput">Мысли по поводу лекции</label>
+      <textarea id="lectureThoughtsInput" placeholder="Что понравилось, что запомнилось, что осталось непонятным"></textarea>
+    </div>
   </div>
 
   <h2 class="section-title">Книги месяца</h2>
@@ -511,8 +518,11 @@
   const subjectsContainer = document.getElementById('subjectsContainer');
   const lekStrip = document.getElementById('lekStrip');
   const lekCountEl = document.getElementById('lekCount');
-  const lecturesList = document.getElementById('lecturesList');
-  const addLectureBtn = document.getElementById('addLectureBtn');
+  const lectureEditor = document.getElementById('lectureEditor');
+  const lectureEditorDay = document.getElementById('lectureEditorDay');
+  const lectureTitleInput = document.getElementById('lectureTitleInput');
+  const lectureThoughtsInput = document.getElementById('lectureThoughtsInput');
+  const lectureDeleteBtn = document.getElementById('lectureDeleteBtn');
   const booksContainer = document.getElementById('booksContainer');
 
   let data = null;
@@ -520,6 +530,7 @@
   let monthValue = '';
   let saveTimer = null;
   let ready = false;
+  let selectedLectureDay = null;
 
   function pad(n){ return String(n).padStart(2,'0'); }
 
@@ -543,9 +554,8 @@
         yazyk: Array(n).fill(false),
         kaligrafiya: Array(n).fill(false),
         interaktiv: Array(n).fill(false),
-        lekcii: Array(n).fill(false),
       },
-      lectures: [],
+      lectures: {},
       books: Array.from({ length: 5 }, () => ({ title: '', thoughts: '', diary: false, checks: Array(n).fill(false) }))
     };
   }
@@ -559,15 +569,44 @@
   function normalize(d, n){
     if (typeof d.theme !== 'string') d.theme = '';
     d.habits = d.habits || {};
-    ['pdd','yazyk','kaligrafiya','interaktiv','lekcii'].forEach(k => {
+    ['pdd','yazyk','kaligrafiya','interaktiv'].forEach(k => {
       d.habits[k] = resizeArray(d.habits[k], n);
     });
-    if (!Array.isArray(d.lectures)) d.lectures = [];
-    d.lectures.forEach(l => {
-      if (typeof l.title !== 'string') l.title = '';
-      if (typeof l.thoughts !== 'string') l.thoughts = '';
-      if (!l.id) l.id = 'l' + Math.random().toString(36).slice(2, 9);
+
+    // migrate old freeform lecture list (array) into a day-keyed object
+    if (Array.isArray(d.lectures)) {
+      const oldList = d.lectures;
+      const checkedDays = Array.isArray(d.habits.lekcii)
+        ? d.habits.lekcii.map((v, i) => (v ? i + 1 : null)).filter(x => x)
+        : [];
+      const migrated = {};
+      let idx = 0;
+      checkedDays.forEach(day => {
+        if (idx < oldList.length) migrated[day] = { title: oldList[idx].title || '', thoughts: oldList[idx].thoughts || '' };
+        idx++;
+      });
+      let nextDay = (checkedDays.length ? Math.max(...checkedDays) : 0) + 1;
+      while (idx < oldList.length && nextDay <= n) {
+        if (!migrated[nextDay]) { migrated[nextDay] = { title: oldList[idx].title || '', thoughts: oldList[idx].thoughts || '' }; idx++; }
+        nextDay++;
+      }
+      d.lectures = migrated;
+    }
+    delete d.habits.lekcii;
+    if (typeof d.lectures !== 'object' || d.lectures === null) d.lectures = {};
+    const cleanedLectures = {};
+    Object.keys(d.lectures).forEach(k => {
+      const dayNum = parseInt(k, 10);
+      if (dayNum >= 1 && dayNum <= n) {
+        const v = d.lectures[k] || {};
+        cleanedLectures[dayNum] = {
+          title: typeof v.title === 'string' ? v.title : '',
+          thoughts: typeof v.thoughts === 'string' ? v.thoughts : ''
+        };
+      }
     });
+    d.lectures = cleanedLectures;
+
     if (!Array.isArray(d.books)) d.books = [];
     while (d.books.length < 5) d.books.push({ title: '', thoughts: '', diary: false, checks: Array(n).fill(false) });
     d.books = d.books.slice(0, 5).map(b => ({
@@ -663,60 +702,68 @@
     });
   }
 
-  function renderLectures(){
-    const values = data.habits.lekcii;
-    const updateCount = () => { lekCountEl.textContent = `${countChecked(values)} из ${days}`; };
-    makeDayStrip(lekStrip, values, updateCount, '--c-lek');
-    updateCount();
-
-    lecturesList.innerHTML = '';
-    data.lectures.forEach(entry => {
-      const wrap = document.createElement('div');
-      wrap.className = 'lecture-entry';
-
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'remove-btn';
-      removeBtn.textContent = 'Удалить';
-      removeBtn.addEventListener('click', () => {
-        data.lectures = data.lectures.filter(l => l.id !== entry.id);
-        renderLectures();
-        doSave();
-      });
-
-      const titleLabel = document.createElement('label');
-      titleLabel.className = 'field-label';
-      titleLabel.textContent = 'Тема лекции';
-      const titleInput = document.createElement('input');
-      titleInput.type = 'text';
-      titleInput.value = entry.title;
-      titleInput.placeholder = 'О чём была лекция';
-      titleInput.addEventListener('input', () => { entry.title = titleInput.value; scheduleSave(); });
-      titleInput.addEventListener('blur', flushSave);
-
-      const thoughtsLabel = document.createElement('label');
-      thoughtsLabel.className = 'field-label';
-      thoughtsLabel.textContent = 'Мысли по поводу лекции';
-      const thoughtsArea = document.createElement('textarea');
-      thoughtsArea.value = entry.thoughts;
-      thoughtsArea.placeholder = 'Что понравилось, что запомнилось, что осталось непонятным';
-      thoughtsArea.addEventListener('input', () => { entry.thoughts = thoughtsArea.value; scheduleSave(); });
-      thoughtsArea.addEventListener('blur', flushSave);
-
-      wrap.appendChild(removeBtn);
-      wrap.appendChild(titleLabel);
-      wrap.appendChild(titleInput);
-      wrap.appendChild(thoughtsLabel);
-      wrap.appendChild(thoughtsArea);
-      lecturesList.appendChild(wrap);
-    });
+  function lectureHasContent(entry){
+    return !!(entry && ((entry.title && entry.title.trim()) || (entry.thoughts && entry.thoughts.trim())));
   }
 
-  function addLecture(){
-    data.lectures.push({ id: 'l' + Math.random().toString(36).slice(2, 9), title: '', thoughts: '' });
+  function renderLectures(){
+    lekStrip.innerHTML = '';
+    let filled = 0;
+    for (let i = 0; i < days; i++){
+      const dayNum = i + 1;
+      const entry = data.lectures[dayNum];
+      const has = lectureHasContent(entry);
+      if (has) filled++;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'day-cell'
+        + (has ? ' checked' : '')
+        + (isWeekend(monthValue, dayNum) ? ' weekend' : '')
+        + (selectedLectureDay === dayNum ? ' selected' : '');
+      btn.style.setProperty('--accent', 'var(--c-lek)');
+      btn.textContent = dayNum;
+      btn.addEventListener('click', () => openLectureDay(dayNum));
+      lekStrip.appendChild(btn);
+    }
+    lekCountEl.textContent = `${filled} из ${days}`;
+  }
+
+  function openLectureDay(dayNum){
+    selectedLectureDay = dayNum;
+    const entry = data.lectures[dayNum] || { title: '', thoughts: '' };
+    lectureEditor.style.display = '';
+    lectureEditorDay.textContent = `День ${dayNum}`;
+    lectureTitleInput.value = entry.title || '';
+    lectureThoughtsInput.value = entry.thoughts || '';
+    renderLectures();
+  }
+
+  function updateLectureEntry(){
+    if (selectedLectureDay == null) return;
+    if (!data.lectures[selectedLectureDay]) data.lectures[selectedLectureDay] = { title: '', thoughts: '' };
+    data.lectures[selectedLectureDay].title = lectureTitleInput.value;
+    data.lectures[selectedLectureDay].thoughts = lectureThoughtsInput.value;
+  }
+
+  function cleanupEmptyLectureEntry(){
+    if (selectedLectureDay == null) return;
+    if (!lectureHasContent(data.lectures[selectedLectureDay])) delete data.lectures[selectedLectureDay];
+    renderLectures();
+  }
+
+  lectureTitleInput.addEventListener('input', () => { updateLectureEntry(); renderLectures(); scheduleSave(); });
+  lectureTitleInput.addEventListener('blur', () => { cleanupEmptyLectureEntry(); flushSave(); });
+  lectureThoughtsInput.addEventListener('input', () => { updateLectureEntry(); renderLectures(); scheduleSave(); });
+  lectureThoughtsInput.addEventListener('blur', () => { cleanupEmptyLectureEntry(); flushSave(); });
+
+  lectureDeleteBtn.addEventListener('click', () => {
+    if (selectedLectureDay == null) return;
+    delete data.lectures[selectedLectureDay];
+    lectureTitleInput.value = '';
+    lectureThoughtsInput.value = '';
     renderLectures();
     doSave();
-  }
+  });
 
   function renderBooks(){
     booksContainer.innerHTML = '';
@@ -803,6 +850,8 @@
     data = d;
     days = n;
     monthValue = value;
+    selectedLectureDay = null;
+    lectureEditor.style.display = 'none';
     renderAll();
     ready = true;
     setStatus('Сохранено');
@@ -820,8 +869,6 @@
 
   themeInput.addEventListener('input', () => { data.theme = themeInput.value; scheduleSave(); });
   themeInput.addEventListener('blur', flushSave);
-
-  addLectureBtn.addEventListener('click', addLecture);
 })();
 </script>
 </body>
