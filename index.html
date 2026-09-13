@@ -460,8 +460,14 @@
 
   loginBtn.addEventListener('click', () => {
     loginError.textContent = '';
-    auth.signInWithRedirect(provider).catch(err => {
-      loginError.textContent = 'Не удалось начать вход: ' + err.message;
+    auth.signInWithPopup(provider).catch(err => {
+      if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request' || err.code === 'auth/operation-not-supported-in-this-environment')) {
+        auth.signInWithRedirect(provider).catch(err2 => {
+          loginError.textContent = 'Не удалось начать вход: ' + err2.message;
+        });
+      } else if (err && err.code !== 'auth/popup-closed-by-user') {
+        loginError.textContent = 'Не удалось войти: ' + err.message;
+      }
     });
   });
 
