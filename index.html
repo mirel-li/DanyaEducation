@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Индивидуальный план занятий — Даня</title>
+<style>
+  :root{
+    --paper: #EEF1EA;
+    --paper-2: #E4E9DE;
+    --ink: #223327;
+    --ink-soft: #5B6B5C;
+    --line: #CBD3C4;
+    --card: #FBFCF9;
+
+    --c-pdd: #D99A2B;
+    --c-pdd-bg: #FBEFD9;
+    --c-yazyk: #3468A0;
+    --c-yazyk-bg: #E1EAF4;
+    --c-kali: #7A4468;
+    --c-kali-bg: #F1E3ED;
+    --c-inter: #2A8C7E;
+    --c-inter-bg: #DFF0EC;
+    --c-lek: #BD5F2A;
+    --c-lek-bg: #F7E5D8;
+    --c-book: #55772F;
+    --c-book-bg: #E7EEDA;
+
+    --radius: 14px;
+    --font-head: "Trebuchet MS", "Segoe UI Rounded", ui-rounded, "Segoe UI", sans-serif;
+    --font-body: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--paper-2) 1px, transparent 1px);
+    background-size: 100% 28px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.45;
+    padding-bottom: 60px;
+  }
+
+  .page{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 18px 14px 0;
+  }
+
+  /* ---------- login screen ---------- */
+  .login-screen{
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 20px;
+  }
+  .login-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+  }
+  .login-card h2{
+    font-family: var(--font-head);
+    margin: 0 0 8px;
+    font-size: 20px;
+  }
+  .login-card p{
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin: 0 0 18px;
+  }
+  .login-btn{
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .login-error{
+    color: #A13B2D;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+
+  .user-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    font-size: 12.5px;
+    color: #C9D6C5;
+  }
+  .user-bar button{
+    font-family: var(--font-body);
+    font-size: 12px;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  .hero{
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: var(--radius);
+    padding: 20px 18px 18px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    right:-30px; top:-30px;
+    width:120px; height:120px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .hero-eyebrow{
+    font-family: var(--font-head);
+    font-size: 13px;
+    color: #B9C9B5;
+    margin: 0 0 4px;
+  }
+  .hero h1{
+    font-family: var(--font-head);
+    font-size: 26px;
+    margin: 0 0 14px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+  .hero-row{
+    display:flex;
+    gap:10px;
+    flex-wrap: wrap;
+  }
+  .hero-field{
+    flex: 1 1 150px;
+    display:flex;
+    flex-direction: column;
+    gap:4px;
+  }
+  .hero-field label{
+    font-size: 12px;
+    color: #B9C9B5;
+  }
+  .hero input[type="month"], .hero input[type="text"]{
+    font-family: var(--font-body);
+    font-size: 15px;
+    padding: 9px 10px;
+    border-radius: 9px;
+    border: none;
+    background: rgba(255,255,255,0.94);
+    color: var(--ink);
+  }
+  .month-label{
+    font-family: var(--font-head);
+    font-size: 14px;
+    color: #DDE7D9;
+    margin-top: 12px;
+  }
+
+  .status{
+    position: fixed;
+    top: 10px;
+    right: 12px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 4px 10px;
+    border-radius: 999px;
+    z-index: 50;
+    transition: opacity 0.2s;
+  }
+
+  h2.section-title{
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 26px 0 10px 2px;
+    color: var(--ink);
+  }
+  .section-hint{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: -6px 0 10px 2px;
+  }
+
+  .subject-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 6px solid var(--accent, var(--ink));
+    border-radius: var(--radius);
+    padding: 14px 14px 12px;
+    margin-bottom: 12px;
+  }
+  .subject-head{
+    display:flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .subject-name{
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 15.5px;
+  }
+  .subject-count{
+    font-size: 12px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .strip{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .day-cell{
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    font-family: var(--font-body);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor: pointer;
+    user-select: none;
+    padding: 0;
+    transition: transform 0.08s ease;
+  }
+  .day-cell.weekend{
+    background: #F4F2EA;
+  }
+  .day-cell:active{ transform: scale(0.92); }
+  .day-cell.checked{
+    background: var(--accent, var(--ink));
+    border-color: var(--accent, var(--ink));
+    color: #fff;
+    font-weight: 700;
+  }
+
+  textarea, input[type="text"]{
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+  }
+  textarea{
+    resize: vertical;
+    min-height: 54px;
+  }
+  .field-label{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 8px 0 4px 1px;
+    display:block;
+  }
+
+  .lecture-entry{
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 10px 8px;
+    margin-top: 10px;
+    position: relative;
+  }
+  .lecture-entry .remove-btn{
+    position:absolute;
+    top: 8px; right: 8px;
+  }
+  .add-btn{
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--c-lek);
+    background: var(--c-lek-bg);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+  .remove-btn{
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: #8A5145;
+    background: #F3DFDA;
+    border: none;
+    border-radius: 7px;
+    padding: 3px 8px;
+    cursor: pointer;
+  }
+
+  .book-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 6px solid var(--c-book);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .book-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom: 8px;
+  }
+  .book-num{
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--c-book-bg);
+    color: var(--c-book);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 12.5px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink: 0;
+  }
+  .checkbox-row{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .checkbox-row input{
+    width: 17px; height: 17px;
+  }
+
+  footer.note{
+    text-align:center;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 24px;
+    padding: 0 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="status" id="status" style="display:none;">Загрузка…</div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <h2>Индивидуальный план занятий — Даня</h2>
+    <p>Войди через Google, чтобы твои данные сохранялись и были одинаковыми на всех устройствах.</p>
+    <button class="login-btn" id="loginBtn">Войти через Google</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="page" id="appRoot" style="display:none;">
+  <div class="hero">
+    <p class="hero-eyebrow">Индивидуальный план занятий</p>
+    <h1>Даня</h1>
+    <div class="hero-row">
+      <div class="hero-field">
+        <label for="monthPicker">Месяц</label>
+        <input type="month" id="monthPicker">
+      </div>
+      <div class="hero-field" style="flex: 2 1 220px;">
+        <label for="themeInput">Тема месяца</label>
+        <input type="text" id="themeInput" placeholder="Например: Осень и урожай">
+      </div>
+    </div>
+    <p class="month-label" id="monthLabel"></p>
+    <div class="user-bar">
+      <span id="userEmail"></span>
+      <button id="logoutBtn">Выйти</button>
+    </div>
+  </div>
+
+  <h2 class="section-title">Ежедневные занятия</h2>
+  <p class="section-hint">Нажимай на день, когда занятие проведено.</p>
+  <div id="subjectsContainer"></div>
+
+  <h2 class="section-title">Лекции</h2>
+  <p class="section-hint">Отмечай дни, когда была лекция, и записывай темы и мысли ниже.</p>
+  <div class="subject-card" id="lecturesCard" style="--accent: var(--c-lek);">
+    <div class="subject-head">
+      <span class="subject-name">Лекции</span>
+      <span class="subject-count" id="lekCount"></span>
+    </div>
+    <div class="strip" id="lekStrip"></div>
+    <div id="lecturesList"></div>
+    <button class="add-btn" id="addLectureBtn">+ Добавить запись о лекции</button>
+  </div>
+
+  <h2 class="section-title">Книги месяца</h2>
+  <p class="section-hint">Пять мест на месяц — название книги, дни чтения, мысли и отметка о читательском дневнике.</p>
+  <div id="booksContainer"></div>
+
+  <footer class="note">Данные привязаны к твоему аккаунту Google и синхронизируются на всех устройствах.</footer>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+
+<script>
+(function(){
+  // ---------- Firebase setup ----------
+  const firebaseConfig = {
+    apiKey: "AIzaSyCK7GJNBExXTlOUnoTzFC9jOVH_767dFBQ",
+    authDomain: "danya-educated.firebaseapp.com",
+    projectId: "danya-educated",
+    storageBucket: "danya-educated.firebasestorage.app",
+    messagingSenderId: "246685657257",
+    appId: "1:246685657257:web:33498b14d2086030a4a1b8",
+    measurementId: "G-L62Q6VT7WL"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  const loginScreen = document.getElementById('loginScreen');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginError = document.getElementById('loginError');
+  const appRoot = document.getElementById('appRoot');
+  const userEmailEl = document.getElementById('userEmail');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const statusEl = document.getElementById('status');
+
+  let currentUser = null;
+
+  loginBtn.addEventListener('click', () => {
+    loginError.textContent = '';
+    auth.signInWithRedirect(provider).catch(err => {
+      loginError.textContent = 'Не удалось начать вход: ' + err.message;
+    });
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    auth.signOut();
+  });
+
+  auth.getRedirectResult().catch(err => {
+    loginError.textContent = 'Ошибка входа: ' + err.message;
+  });
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      currentUser = user;
+      loginScreen.style.display = 'none';
+      appRoot.style.display = '';
+      statusEl.style.display = '';
+      userEmailEl.textContent = user.displayName ? user.displayName : (user.email || '');
+      const initial = currentMonthValue();
+      monthPicker.value = initial;
+      loadMonth(initial);
+    } else {
+      currentUser = null;
+      loginScreen.style.display = 'flex';
+      appRoot.style.display = 'none';
+      statusEl.style.display = 'none';
+    }
+  });
+
+  // ---------- App logic ----------
+  const SUBJECTS = [
+    { key: 'pdd',       label: 'ПДД',         color: '--c-pdd' },
+    { key: 'yazyk',      label: 'Язык',        color: '--c-yazyk' },
+    { key: 'kaligrafiya',label: 'Каллиграфия', color: '--c-kali' },
+    { key: 'interaktiv', label: 'Интерактив',  color: '--c-inter' },
+  ];
+
+  const monthPicker = document.getElementById('monthPicker');
+  const themeInput = document.getElementById('themeInput');
+  const monthLabelEl = document.getElementById('monthLabel');
+  const subjectsContainer = document.getElementById('subjectsContainer');
+  const lekStrip = document.getElementById('lekStrip');
+  const lekCountEl = document.getElementById('lekCount');
+  const lecturesList = document.getElementById('lecturesList');
+  const addLectureBtn = document.getElementById('addLectureBtn');
+  const booksContainer = document.getElementById('booksContainer');
+
+  let data = null;
+  let days = 30;
+  let monthValue = '';
+  let saveTimer = null;
+  let ready = false;
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function daysInMonth(value){
+    const [y, m] = value.split('-').map(Number);
+    return new Date(y, m, 0).getDate();
+  }
+
+  function isWeekend(value, dayNum){
+    const [y, m] = value.split('-').map(Number);
+    const d = new Date(y, m - 1, dayNum);
+    const wd = d.getDay();
+    return wd === 0 || wd === 6;
+  }
+
+  function defaultData(n){
+    return {
+      theme: '',
+      habits: {
+        pdd: Array(n).fill(false),
+        yazyk: Array(n).fill(false),
+        kaligrafiya: Array(n).fill(false),
+        interaktiv: Array(n).fill(false),
+        lekcii: Array(n).fill(false),
+      },
+      lectures: [],
+      books: Array.from({ length: 5 }, () => ({ title: '', thoughts: '', diary: false, checks: Array(n).fill(false) }))
+    };
+  }
+
+  function resizeArray(arr, n){
+    arr = Array.isArray(arr) ? arr.slice(0, n) : [];
+    while (arr.length < n) arr.push(false);
+    return arr;
+  }
+
+  function normalize(d, n){
+    if (typeof d.theme !== 'string') d.theme = '';
+    d.habits = d.habits || {};
+    ['pdd','yazyk','kaligrafiya','interaktiv','lekcii'].forEach(k => {
+      d.habits[k] = resizeArray(d.habits[k], n);
+    });
+    if (!Array.isArray(d.lectures)) d.lectures = [];
+    d.lectures.forEach(l => {
+      if (typeof l.title !== 'string') l.title = '';
+      if (typeof l.thoughts !== 'string') l.thoughts = '';
+      if (!l.id) l.id = 'l' + Math.random().toString(36).slice(2, 9);
+    });
+    if (!Array.isArray(d.books)) d.books = [];
+    while (d.books.length < 5) d.books.push({ title: '', thoughts: '', diary: false, checks: Array(n).fill(false) });
+    d.books = d.books.slice(0, 5).map(b => ({
+      title: typeof b.title === 'string' ? b.title : '',
+      thoughts: typeof b.thoughts === 'string' ? b.thoughts : '',
+      diary: !!b.diary,
+      checks: resizeArray(b.checks, n)
+    }));
+    return d;
+  }
+
+  function setStatus(text){ statusEl.textContent = text; }
+
+  function docRef(uid, value){
+    return db.collection('users').doc(uid).collection('months').doc(value);
+  }
+
+  function scheduleSave(){
+    setStatus('Сохранение…');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(doSave, 500);
+  }
+
+  async function doSave(){
+    if (!ready || !currentUser) return;
+    try {
+      await docRef(currentUser.uid, monthValue).set({
+        json: JSON.stringify(data),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      setStatus('Сохранено');
+    } catch (e) {
+      setStatus('Не удалось сохранить');
+    }
+  }
+
+  function flushSave(){
+    clearTimeout(saveTimer);
+    doSave();
+  }
+
+  function makeDayStrip(container, values, onToggle, accentVar){
+    container.innerHTML = '';
+    for (let i = 0; i < days; i++){
+      const dayNum = i + 1;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'day-cell' + (values[i] ? ' checked' : '') + (isWeekend(monthValue, dayNum) ? ' weekend' : '');
+      btn.style.setProperty('--accent', `var(${accentVar})`);
+      btn.textContent = dayNum;
+      btn.setAttribute('aria-pressed', values[i] ? 'true' : 'false');
+      btn.addEventListener('click', () => {
+        values[i] = !values[i];
+        btn.classList.toggle('checked', values[i]);
+        btn.setAttribute('aria-pressed', values[i] ? 'true' : 'false');
+        onToggle();
+        doSave();
+      });
+      container.appendChild(btn);
+    }
+  }
+
+  function countChecked(arr){ return arr.filter(Boolean).length; }
+
+  function renderSubjects(){
+    subjectsContainer.innerHTML = '';
+    SUBJECTS.forEach(subj => {
+      const card = document.createElement('div');
+      card.className = 'subject-card';
+      card.style.setProperty('--accent', `var(${subj.color})`);
+
+      const head = document.createElement('div');
+      head.className = 'subject-head';
+      const name = document.createElement('span');
+      name.className = 'subject-name';
+      name.textContent = subj.label;
+      const count = document.createElement('span');
+      count.className = 'subject-count';
+      head.appendChild(name);
+      head.appendChild(count);
+
+      const strip = document.createElement('div');
+      strip.className = 'strip';
+
+      card.appendChild(head);
+      card.appendChild(strip);
+      subjectsContainer.appendChild(card);
+
+      const values = data.habits[subj.key];
+      const updateCount = () => { count.textContent = `${countChecked(values)} из ${days}`; };
+      makeDayStrip(strip, values, updateCount, subj.color);
+      updateCount();
+    });
+  }
+
+  function renderLectures(){
+    const values = data.habits.lekcii;
+    const updateCount = () => { lekCountEl.textContent = `${countChecked(values)} из ${days}`; };
+    makeDayStrip(lekStrip, values, updateCount, '--c-lek');
+    updateCount();
+
+    lecturesList.innerHTML = '';
+    data.lectures.forEach(entry => {
+      const wrap = document.createElement('div');
+      wrap.className = 'lecture-entry';
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'remove-btn';
+      removeBtn.textContent = 'Удалить';
+      removeBtn.addEventListener('click', () => {
+        data.lectures = data.lectures.filter(l => l.id !== entry.id);
+        renderLectures();
+        doSave();
+      });
+
+      const titleLabel = document.createElement('label');
+      titleLabel.className = 'field-label';
+      titleLabel.textContent = 'Тема лекции';
+      const titleInput = document.createElement('input');
+      titleInput.type = 'text';
+      titleInput.value = entry.title;
+      titleInput.placeholder = 'О чём была лекция';
+      titleInput.addEventListener('input', () => { entry.title = titleInput.value; scheduleSave(); });
+      titleInput.addEventListener('blur', flushSave);
+
+      const thoughtsLabel = document.createElement('label');
+      thoughtsLabel.className = 'field-label';
+      thoughtsLabel.textContent = 'Мысли по поводу лекции';
+      const thoughtsArea = document.createElement('textarea');
+      thoughtsArea.value = entry.thoughts;
+      thoughtsArea.placeholder = 'Что понравилось, что запомнилось, что осталось непонятным';
+      thoughtsArea.addEventListener('input', () => { entry.thoughts = thoughtsArea.value; scheduleSave(); });
+      thoughtsArea.addEventListener('blur', flushSave);
+
+      wrap.appendChild(removeBtn);
+      wrap.appendChild(titleLabel);
+      wrap.appendChild(titleInput);
+      wrap.appendChild(thoughtsLabel);
+      wrap.appendChild(thoughtsArea);
+      lecturesList.appendChild(wrap);
+    });
+  }
+
+  function addLecture(){
+    data.lectures.push({ id: 'l' + Math.random().toString(36).slice(2, 9), title: '', thoughts: '' });
+    renderLectures();
+    doSave();
+  }
+
+  function renderBooks(){
+    booksContainer.innerHTML = '';
+    data.books.forEach((book, idx) => {
+      const card = document.createElement('div');
+      card.className = 'book-card';
+
+      const head = document.createElement('div');
+      head.className = 'book-head';
+      const num = document.createElement('span');
+      num.className = 'book-num';
+      num.textContent = String(idx + 1);
+      const titleInput = document.createElement('input');
+      titleInput.type = 'text';
+      titleInput.placeholder = 'Название книги';
+      titleInput.value = book.title;
+      titleInput.style.flex = '1';
+      titleInput.addEventListener('input', () => { book.title = titleInput.value; scheduleSave(); });
+      titleInput.addEventListener('blur', flushSave);
+      head.appendChild(num);
+      head.appendChild(titleInput);
+
+      const stripLabel = document.createElement('label');
+      stripLabel.className = 'field-label';
+      stripLabel.textContent = 'Дни чтения';
+      const strip = document.createElement('div');
+      strip.className = 'strip';
+
+      const thoughtsLabel = document.createElement('label');
+      thoughtsLabel.className = 'field-label';
+      thoughtsLabel.textContent = 'Мысли о книге';
+      const thoughtsArea = document.createElement('textarea');
+      thoughtsArea.value = book.thoughts;
+      thoughtsArea.placeholder = 'Впечатления, любимые моменты, о чём книга';
+      thoughtsArea.addEventListener('input', () => { book.thoughts = thoughtsArea.value; scheduleSave(); });
+      thoughtsArea.addEventListener('blur', flushSave);
+
+      const checkboxRow = document.createElement('label');
+      checkboxRow.className = 'checkbox-row';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = book.diary;
+      checkbox.addEventListener('change', () => { book.diary = checkbox.checked; doSave(); });
+      const checkboxText = document.createElement('span');
+      checkboxText.textContent = 'Есть запись в читательском дневнике';
+      checkboxRow.appendChild(checkbox);
+      checkboxRow.appendChild(checkboxText);
+
+      card.appendChild(head);
+      card.appendChild(stripLabel);
+      card.appendChild(strip);
+      card.appendChild(thoughtsLabel);
+      card.appendChild(thoughtsArea);
+      card.appendChild(checkboxRow);
+      booksContainer.appendChild(card);
+
+      makeDayStrip(strip, book.checks, () => {}, '--c-book');
+    });
+  }
+
+  function renderAll(){
+    themeInput.value = data.theme;
+    const [y, m] = monthValue.split('-').map(Number);
+    const formatted = new Date(y, m - 1, 1).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+    monthLabelEl.textContent = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+    renderSubjects();
+    renderLectures();
+    renderBooks();
+  }
+
+  async function loadMonth(value){
+    if (!currentUser) return;
+    ready = false;
+    setStatus('Загрузка…');
+    const n = daysInMonth(value);
+    let d;
+    try {
+      const snap = await docRef(currentUser.uid, value).get();
+      d = snap.exists && snap.data().json ? JSON.parse(snap.data().json) : defaultData(n);
+    } catch (e) {
+      d = defaultData(n);
+    }
+    d = normalize(d, n);
+    data = d;
+    days = n;
+    monthValue = value;
+    renderAll();
+    ready = true;
+    setStatus('Сохранено');
+  }
+
+  function currentMonthValue(){
+    const now = new Date();
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
+  }
+
+  monthPicker.addEventListener('change', () => {
+    flushSave();
+    loadMonth(monthPicker.value);
+  });
+
+  themeInput.addEventListener('input', () => { data.theme = themeInput.value; scheduleSave(); });
+  themeInput.addEventListener('blur', flushSave);
+
+  addLectureBtn.addEventListener('click', addLecture);
+})();
+</script>
+</body>
+</html>
