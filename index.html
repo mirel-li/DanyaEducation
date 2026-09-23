@@ -2,874 +2,773 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Индивидуальный план занятий — Даня</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Трекер · Даниил</title>
 <style>
-  :root{
-    --paper: #EEF1EA;
-    --paper-2: #E4E9DE;
-    --ink: #223327;
-    --ink-soft: #5B6B5C;
-    --line: #CBD3C4;
-    --card: #FBFCF9;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
-    --c-pdd: #D99A2B;
-    --c-pdd-bg: #FBEFD9;
-    --c-yazyk: #3468A0;
-    --c-yazyk-bg: #E1EAF4;
-    --c-kali: #7A4468;
-    --c-kali-bg: #F1E3ED;
-    --c-inter: #2A8C7E;
-    --c-inter-bg: #DFF0EC;
-    --c-lek: #BD5F2A;
-    --c-lek-bg: #F7E5D8;
-    --c-book: #55772F;
-    --c-book-bg: #E7EEDA;
+:root {
+--bg: #f5f5f5;
+--s1: #ffffff;
+--s2: #f0f0f0;
+--b1: #e0e0e0;
+--b2: #cccccc;
+--t1: #1a1a1a;
+--t2: #666;
+--t3: #999;
+  --gold: #c8a96e;
+  --gold-d: rgba(200,169,110,0.13);
+  --green: #4caf7d;
+  --green-d: rgba(76,175,125,0.14);
+  --blue: #5b9bd5;
+  --blue-d: rgba(91,155,213,0.14);
+  --red: #e05c5c;
+  --r: 7px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--t1);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
 
-    --radius: 14px;
-    --font-head: "Trebuchet MS", "Segoe UI Rounded", ui-rounded, "Segoe UI", sans-serif;
-    --font-body: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
-  }
+.hdr{padding:22px 24px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.hdr-l{display:flex;align-items:baseline;gap:10px;}
+.hdr-name{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;letter-spacing:.05em;color:var(--t1);}
+.hdr-sep{color:var(--b2);font-size:14px;}
+.hdr-month{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;}
+.nav{display:flex;gap:5px;}
+.nav button{width:28px;height:28px;border-radius:5px;background:var(--s1);border:1px solid var(--b1);color:var(--t2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.nav button:hover{border-color:var(--gold);color:var(--gold);}
 
-  *{ box-sizing: border-box; }
+.tabs{display:flex;padding:0 24px;border-bottom:1px solid var(--b1);}
+.tab{padding:12px 16px;font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:.15s;}
+.tab:hover{color:var(--t2);}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);}
 
-  body{
-    margin:0;
-    background: var(--paper);
-    background-image:
-      linear-gradient(var(--paper-2) 1px, transparent 1px);
-    background-size: 100% 28px;
-    color: var(--ink);
-    font-family: var(--font-body);
-    line-height: 1.45;
-    padding-bottom: 60px;
-  }
+.main{padding:20px 24px;max-width:1500px;}
+.page{display:none;}
+.page.on{display:block;}
 
-  .page{
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 18px 14px 0;
-  }
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:28px 24px;max-width:340px;width:100%;text-align:center;}
+.login-card h2{font-family:'JetBrains Mono',monospace;font-size:18px;margin-bottom:8px;letter-spacing:.05em;}
+.login-card p{color:var(--t2);font-size:13px;margin-bottom:18px;line-height:1.5;}
+.login-btn{font-family:'Inter',sans-serif;font-size:14px;font-weight:600;background:#1a1a1a;color:#fff;border:none;border-radius:8px;padding:11px 16px;cursor:pointer;width:100%;}
+.login-btn:hover{filter:brightness(1.1);}
+.login-error{color:var(--red);font-size:12px;margin-top:10px;}
 
-  /* ---------- login screen ---------- */
-  .login-screen{
-    min-height: 100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding: 20px;
-  }
-  .login-card{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 28px 24px;
-    max-width: 360px;
-    width: 100%;
-    text-align: center;
-  }
-  .login-card h2{
-    font-family: var(--font-head);
-    margin: 0 0 8px;
-    font-size: 20px;
-  }
-  .login-card p{
-    color: var(--ink-soft);
-    font-size: 14px;
-    margin: 0 0 18px;
-  }
-  .login-btn{
-    font-family: var(--font-body);
-    font-size: 15px;
-    font-weight: 600;
-    background: var(--ink);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 18px;
-    cursor: pointer;
-    width: 100%;
-  }
-  .login-error{
-    color: #A13B2D;
-    font-size: 13px;
-    margin-top: 12px;
-  }
+.userbar{display:flex;justify-content:space-between;align-items:center;padding:8px 24px;font-size:11px;color:var(--t3);border-bottom:1px solid var(--b1);}
+.userbar button{background:none;border:1px solid var(--b2);color:var(--t2);border-radius:5px;padding:3px 9px;font-size:11px;cursor:pointer;}
+.userbar button:hover{color:var(--t1);border-color:var(--gold);}
 
-  .user-bar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap: 8px;
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(255,255,255,0.15);
-    font-size: 12.5px;
-    color: #C9D6C5;
-  }
-  .user-bar button{
-    font-family: var(--font-body);
-    font-size: 12px;
-    background: rgba(255,255,255,0.12);
-    color: #fff;
-    border: none;
-    border-radius: 7px;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
+.status{position:fixed;top:10px;right:12px;font-size:11px;color:var(--t2);background:var(--s1);border:1px solid var(--b1);padding:4px 10px;border-radius:999px;z-index:50;}
 
-  .hero{
-    background: var(--ink);
-    color: var(--paper);
-    border-radius: var(--radius);
-    padding: 20px 18px 18px;
-    margin-bottom: 18px;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::after{
-    content:"";
-    position:absolute;
-    right:-30px; top:-30px;
-    width:120px; height:120px;
-    border-radius:50%;
-    background: rgba(255,255,255,0.06);
-  }
-  .hero-eyebrow{
-    font-family: var(--font-head);
-    font-size: 13px;
-    color: #B9C9B5;
-    margin: 0 0 4px;
-  }
-  .hero h1{
-    font-family: var(--font-head);
-    font-size: 26px;
-    margin: 0 0 14px;
-    font-weight: 700;
-    letter-spacing: 0.2px;
-  }
-  .hero-row{
-    display:flex;
-    gap:10px;
-    flex-wrap: wrap;
-  }
-  .hero-field{
-    flex: 1 1 150px;
-    display:flex;
-    flex-direction: column;
-    gap:4px;
-  }
-  .hero-field label{
-    font-size: 12px;
-    color: #B9C9B5;
-  }
-  .hero input[type="month"], .hero input[type="text"]{
-    font-family: var(--font-body);
-    font-size: 15px;
-    padding: 9px 10px;
-    border-radius: 9px;
-    border: none;
-    background: rgba(255,255,255,0.94);
-    color: var(--ink);
-  }
-  .month-label{
-    font-family: var(--font-head);
-    font-size: 14px;
-    color: #DDE7D9;
-    margin-top: 12px;
-  }
+.sec{margin-bottom:28px;}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;}
 
-  .status{
-    position: fixed;
-    top: 10px;
-    right: 12px;
-    font-size: 12px;
-    color: var(--ink-soft);
-    background: var(--card);
-    border: 1px solid var(--line);
-    padding: 4px 10px;
-    border-radius: 999px;
-    z-index: 50;
-    transition: opacity 0.2s;
-  }
+.grid-wrap{display:flex;gap:0;}
+.grid-labels{flex-shrink:0;display:flex;flex-direction:column;gap:2px;margin-right:6px;}
+.grid-header-spacer{height:18px;}
+.row-lbl{height:30px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2);white-space:nowrap;padding-right:4px;}
+.row-lbl .ic{font-size:12px;}
 
-  h2.section-title{
-    font-family: var(--font-head);
-    font-size: 16px;
-    font-weight: 700;
-    margin: 26px 0 10px 2px;
-    color: var(--ink);
-  }
-  .section-hint{
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    margin: -6px 0 10px 2px;
-  }
+.grid-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.grid-scroll::-webkit-scrollbar{height:3px;}
+.grid-scroll::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
 
-  .subject-card{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-left: 6px solid var(--accent, var(--ink));
-    border-radius: var(--radius);
-    padding: 14px 14px 12px;
-    margin-bottom: 12px;
-  }
-  .subject-head{
-    display:flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  .subject-name{
-    font-family: var(--font-head);
-    font-weight: 700;
-    font-size: 15.5px;
-  }
-  .subject-count{
-    font-size: 12px;
-    color: var(--ink-soft);
-    white-space: nowrap;
-  }
+.grid{display:flex;flex-direction:column;gap:2px;min-width:fit-content;}
+.grid-days{display:flex;gap:2px;margin-bottom:0;}
+.day-hdr{width:30px;height:18px;display:flex;align-items:flex-end;justify-content:center;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t3);padding-bottom:2px;}
+.day-hdr.today{color:var(--gold);}
+.grid-row{display:flex;gap:2px;}
 
-  .strip{
-    display:flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .day-cell{
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: var(--ink-soft);
-    font-size: 12.5px;
-    font-family: var(--font-body);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor: pointer;
-    user-select: none;
-    padding: 0;
-    transition: transform 0.08s ease;
-  }
-  .day-cell.weekend{
-    background: #F4F2EA;
-  }
-  .day-cell:active{ transform: scale(0.92); }
-  .day-cell.checked{
-    background: var(--accent, var(--ink));
-    border-color: var(--accent, var(--ink));
-    color: #fff;
-    font-weight: 700;
-  }
+.cell{width:30px;height:30px;border-radius:5px;background:var(--s1);border:1px solid var(--b1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);transition:border-color .12s,background .12s;}
+.cell:hover{border-color:var(--b2);}
+.cell.off{background:transparent;border-color:transparent;pointer-events:none;opacity:.25;}
+.cell.done{background:var(--green-d);border-color:var(--green);}
+.cell.done::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
+.cell.blue{background:var(--blue-d);border-color:var(--blue);color:var(--blue);}
+.cell.green-txt{background:var(--green-d);border-color:var(--green);color:var(--green);}
+.cell.gold{background:var(--gold-d);border-color:var(--gold);color:var(--gold);}
+.cell.red{background:rgba(224,92,92,.12);border-color:var(--red);color:var(--red);}
+.cell.amber{background:rgba(200,169,110,.1);border-color:var(--gold);color:var(--gold);}
 
-  textarea, input[type="text"]{
-    font-family: var(--font-body);
-    font-size: 14.5px;
-    width: 100%;
-    padding: 9px 10px;
-    border-radius: 9px;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: var(--ink);
-  }
-  textarea{
-    resize: vertical;
-    min-height: 54px;
-  }
-  .field-label{
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin: 8px 0 4px 1px;
-    display:block;
-  }
+.wdots{display:flex;flex-wrap:wrap;gap:1px;justify-content:center;width:20px;}
+.wd{width:4px;height:4px;border-radius:50%;background:var(--b2);}
+.wd.on{background:var(--blue);}
 
-  .day-cell.selected{
-    box-shadow: 0 0 0 2px var(--accent, var(--ink));
-  }
+.cell.mood-set{background:var(--s2);border-color:var(--b2);font-size:14px;}
 
-  .lecture-editor{
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 10px 10px 8px;
-    margin-top: 12px;
-  }
-  .lecture-editor-head{
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-  .lecture-editor-day{
-    font-family: var(--font-head);
-    font-weight: 700;
-    font-size: 14px;
-  }
-  .remove-btn{
-    font-family: var(--font-body);
-    font-size: 12px;
-    color: #8A5145;
-    background: #F3DFDA;
-    border: none;
-    border-radius: 7px;
-    padding: 3px 8px;
-    cursor: pointer;
-  }
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s;}
+.overlay.on{opacity:1;pointer-events:all;}
+.modal{background:var(--s2);border:1px solid var(--b2);border-radius:12px;padding:22px;width:310px;max-width:92vw;transform:translateY(6px);transition:transform .2s;}
+.overlay.on .modal{transform:translateY(0);}
+.m-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.m-sub{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:18px;}
+.m-lbl{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:5px;}
+.m-input{width:auto;background:var(--s1);border:1px solid var(--b2);border-radius:5px;padding:8px 11px;color:var(--t1);font-size:13px;font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .15s;margin-bottom:12px;}
+.m-input:focus{border-color:var(--gold);}
+textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;font-size:12px;line-height:1.5;}
+.m-btns{display:flex;gap:7px;margin-top:6px;}
+.btn{flex:1;padding:9px;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:.15s;}
+.btn-p{background:#1a1a1a;color:#f5f5f5;}
+.btn-p:hover{filter:brightness(1.1);}
+.btn-s{background:var(--s1);border:1px solid var(--b2);color:var(--t2);}
+.btn-s:hover{color:var(--t1);}
+.btn-d{background:transparent;border:1px solid var(--red);color:var(--red);}
+.btn-d:hover{background:rgba(224,92,92,.1);}
 
-  .book-card{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-left: 6px solid var(--c-book);
-    border-radius: var(--radius);
-    padding: 14px;
-    margin-bottom: 12px;
-  }
-  .book-head{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-bottom: 8px;
-  }
-  .book-num{
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    background: var(--c-book-bg);
-    color: var(--c-book);
-    font-family: var(--font-head);
-    font-weight: 700;
-    font-size: 12.5px;
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink: 0;
-  }
-  .checkbox-row{
-    display:flex;
-    align-items:center;
-    gap: 8px;
-    margin-top: 10px;
-    font-size: 13.5px;
-    color: var(--ink);
-  }
-  .checkbox-row input{
-    width: 17px; height: 17px;
-  }
+.mood-pick{display:flex;gap:7px;justify-content:center;margin:4px 0 14px;}
+.mp{width:42px;height:42px;border-radius:7px;background:var(--s1);border:2px solid var(--b1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:.12s;}
+.mp:hover,.mp.on{border-color:var(--gold);background:var(--gold-d);}
 
-  footer.note{
-    text-align:center;
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin-top: 24px;
-    padding: 0 20px;
+.wpick{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:4px 0 14px;}
+.wp{width:34px;height:34px;border-radius:5px;background:var(--s1);border:1px solid var(--b1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--t3);transition:.12s;}
+.wp:hover,.wp.on{border-color:var(--blue);color:var(--blue);}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-bottom:24px;}
+.sc{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:16px 18px;}
+.sc-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:7px;}
+.sc-val{font-size:26px;font-weight:500;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:3px;}
+.sc-val .u{font-size:12px;color:var(--t3);font-weight:400;}
+.sc-sub{font-size:11px;color:var(--t3);}
+.sc-bar{height:2px;background:var(--b1);border-radius:2px;margin-top:11px;overflow:hidden;}
+.sc-fill{height:100%;border-radius:2px;background:var(--gold);transition:width .5s;}
+
+.export-box{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:18px;}
+.export-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;}
+.export-txt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);line-height:1.8;white-space:pre-wrap;max-height:260px;overflow-y:auto;}
+.export-btn{margin-top:12px;padding:8px 16px;background:#1a1a1a;color:#f5f5f5;border:none;border-radius:5px;font-size:12px;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:filter .15s;}
+.export-btn:hover{filter:brightness(1.1);}
+
+.book-block{padding-bottom:2px;}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#141414;--s1:#1c1c1c;--s2:#202020;--b1:#2c2c2c;--b2:#3a3a3a;--t1:#eee;--t2:#aaa;--t3:#777;
   }
+}
+:root[data-theme="dark"] {
+  --bg:#141414;--s1:#1c1c1c;--s2:#202020;--b1:#2c2c2c;--b2:#3a3a3a;--t1:#eee;--t2:#aaa;--t3:#777;
+}
 </style>
 </head>
 <body>
 
 <div class="status" id="status" style="display:none;">Загрузка…</div>
 
-<!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
-    <h2>Индивидуальный план занятий — Даня</h2>
-    <p>Войди через Google, чтобы твои данные сохранялись и были одинаковыми на всех устройствах.</p>
+    <h2>ДАНИИЛ</h2>
+    <p>Войди через Google, чтобы данные трекера сохранялись и были одинаковыми на всех устройствах.</p>
     <button class="login-btn" id="loginBtn">Войти через Google</button>
     <div class="login-error" id="loginError"></div>
   </div>
 </div>
 
-<!-- MAIN APP -->
-<div class="page" id="appRoot" style="display:none;">
-  <div class="hero">
-    <p class="hero-eyebrow">Индивидуальный план занятий</p>
-    <h1>Даня</h1>
-    <div class="hero-row">
-      <div class="hero-field">
-        <label for="monthPicker">Месяц</label>
-        <input type="month" id="monthPicker">
-      </div>
-      <div class="hero-field" style="flex: 2 1 220px;">
-        <label for="themeInput">Тема месяца</label>
-        <input type="text" id="themeInput" placeholder="Например: Осень и урожай">
-      </div>
-    </div>
-    <p class="month-label" id="monthLabel"></p>
-    <div class="user-bar">
-      <span id="userEmail"></span>
-      <button id="logoutBtn">Выйти</button>
-    </div>
+<div id="appShell" style="display:none;">
+<div class="hdr">
+  <div class="hdr-l">
+    <span class="hdr-name">ДАНИИЛ</span>
+    <span class="hdr-sep">/</span>
+    <span class="hdr-month" id="mLabel"></span>
   </div>
-
-  <h2 class="section-title">Ежедневные занятия</h2>
-  <p class="section-hint">Нажимай на день, когда занятие проведено.</p>
-  <div id="subjectsContainer"></div>
-
-  <h2 class="section-title">Лекции</h2>
-  <p class="section-hint">Нажми на день — откроется место для темы лекции и мыслей по ней.</p>
-  <div class="subject-card" id="lecturesCard" style="--accent: var(--c-lek);">
-    <div class="subject-head">
-      <span class="subject-name">Лекции</span>
-      <span class="subject-count" id="lekCount"></span>
-    </div>
-    <div class="strip" id="lekStrip"></div>
-    <div id="lectureEditor" class="lecture-editor" style="display:none;">
-      <div class="lecture-editor-head">
-        <span class="lecture-editor-day" id="lectureEditorDay"></span>
-        <button type="button" class="remove-btn" id="lectureDeleteBtn">Удалить запись</button>
-      </div>
-      <label class="field-label" for="lectureTitleInput">Тема лекции</label>
-      <input type="text" id="lectureTitleInput" placeholder="О чём была лекция">
-      <label class="field-label" for="lectureThoughtsInput">Мысли по поводу лекции</label>
-      <textarea id="lectureThoughtsInput" placeholder="Что понравилось, что запомнилось, что осталось непонятным"></textarea>
-    </div>
+  <div class="nav">
+    <button onclick="goMonth(-1)">‹</button>
+    <button onclick="goMonth(1)">›</button>
   </div>
-
-  <h2 class="section-title">Книги месяца</h2>
-  <p class="section-hint">Пять мест на месяц — название книги, дни чтения, мысли и отметка о читательском дневнике.</p>
-  <div id="booksContainer"></div>
-
-  <footer class="note">Данные привязаны к твоему аккаунту Google и синхронизируются на всех устройствах.</footer>
 </div>
 
-<!-- Firebase SDK -->
+<div class="userbar" id="userBar">
+  <span id="userEmail"></span>
+  <button id="logoutBtn">Выйти</button>
+</div>
+
+<div class="tabs">
+  <div class="tab on" onclick="showTab('tracker',this)">Трекер</div>
+  <div class="tab" onclick="showTab('summary',this)">Итоги</div>
+</div>
+
+<div class="main">
+
+  <div class="page on" id="page-tracker">
+    <div class="sec"><div class="sec-lbl">Сон</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-sleep"></div>
+        <div class="grid-scroll"><div class="grid" id="g-sleep"></div></div>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-lbl">Ежедневные привычки</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-habits"></div>
+        <div class="grid-scroll"><div class="grid" id="g-habits"></div></div>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-lbl">Водный баланс</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-water"></div>
+        <div class="grid-scroll"><div class="grid" id="g-water"></div></div>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-lbl">Дневник дня</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-diary"></div>
+        <div class="grid-scroll"><div class="grid" id="g-diary"></div></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-lbl">Учебный план</div>
+      <div style="margin-bottom:16px;">
+        <div class="m-lbl">Тема месяца</div>
+        <input class="m-input" id="themeInput" style="width:100%;max-width:320px;" placeholder="Например: Осень и урожай" oninput="saveTheme(this.value)">
+      </div>
+
+      <div class="sec-lbl" style="margin-top:6px;">Предметы</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-subj"></div>
+        <div class="grid-scroll"><div class="grid" id="g-subj"></div></div>
+      </div>
+
+      <div class="sec-lbl" style="margin-top:18px;">Лекции</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-lec"></div>
+        <div class="grid-scroll"><div class="grid" id="g-lec"></div></div>
+      </div>
+
+      <div class="sec-lbl" style="margin-top:18px;">Книги месяца</div>
+      <div id="booksWrap"></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-summary">
+    <div class="stats" id="statsGrid"></div>
+    <div class="export-box">
+      <div class="export-lbl">Отчёт для нейросети</div>
+      <div class="export-txt" id="exportTxt"></div>
+      <button class="export-btn" onclick="copyExport()">Скопировать</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="outsideClose(event)">
+  <div class="modal">
+    <div class="m-title" id="mTitle"></div>
+    <div class="m-sub" id="mSub"></div>
+    <div id="mBody"></div>
+    <div class="m-btns">
+      <button class="btn btn-s" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-d" id="btnDel" onclick="delEntry()" style="display:none">Удалить</button>
+      <button class="btn btn-p" onclick="saveEntry()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 
 <script>
-(function(){
-  // ---------- Firebase setup ----------
-  const firebaseConfig = {
-    apiKey: "AIzaSyCK7GJNBExXTlOUnoTzFC9jOVH_767dFBQ",
-    authDomain: "danya-educated.firebaseapp.com",
-    projectId: "danya-educated",
-    storageBucket: "danya-educated.firebasestorage.app",
-    messagingSenderId: "246685657257",
-    appId: "1:246685657257:web:33498b14d2086030a4a1b8",
-    measurementId: "G-L62Q6VT7WL"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  const provider = new firebase.auth.GoogleAuthProvider();
+const firebaseConfig = {
+  apiKey: "AIzaSyCK7GJNBExXTlOUnoTzFC9jOVH_767dFBQ",
+  authDomain: "danya-educated.firebaseapp.com",
+  projectId: "danya-educated",
+  storageBucket: "danya-educated.firebasestorage.app",
+  messagingSenderId: "246685657257",
+  appId: "1:246685657257:web:33498b14d2086030a4a1b8",
+  measurementId: "G-L62Q6VT7WL"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const provider = new firebase.auth.GoogleAuthProvider();
+let currentUser = null;
 
-  const loginScreen = document.getElementById('loginScreen');
-  const loginBtn = document.getElementById('loginBtn');
-  const loginError = document.getElementById('loginError');
-  const appRoot = document.getElementById('appRoot');
-  const userEmailEl = document.getElementById('userEmail');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const statusEl = document.getElementById('status');
+const MO = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const HABITS = [
+  {id:'charge',  ic:'⚡', lbl:'Зарядка'},
+  {id:'sober',   ic:'🚫', lbl:'Трезвость'},
+  {id:'workout', ic:'🏋️', lbl:'Тренировка'},
+  {id:'selfdev', ic:'🌱', lbl:'Саморазвитие'},
+];
+const SUBJ = [
+  {id:'subj_pdd', ic:'🚗', lbl:'ПДД'},
+  {id:'subj_yaz', ic:'🗣️', lbl:'Язык'},
+  {id:'subj_kal', ic:'✍️', lbl:'Каллиграфия'},
+  {id:'subj_int', ic:'🧩', lbl:'Интерактив'},
+];
+const MOODS = ['😞','😕','😐','🙂','😊'];
 
-  let currentUser = null;
+let yr, mo, D = {}, ctx = null;
+let saveTimer=null;
 
-  loginBtn.addEventListener('click', () => {
-    loginError.textContent = '';
-    auth.signInWithPopup(provider).catch(err => {
-      if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request' || err.code === 'auth/operation-not-supported-in-this-environment')) {
-        auth.signInWithRedirect(provider).catch(err2 => {
-          loginError.textContent = 'Не удалось начать вход: ' + err2.message;
-        });
-      } else if (err && err.code !== 'auth/popup-closed-by-user') {
-        loginError.textContent = 'Не удалось войти: ' + err.message;
+function storeKey(y,m){return `h_${y}_${m}`;}
+function docRef(uid,key){return db.collection('users').doc(uid).collection('months').doc(key);}
+function setStatus(t){const el=document.getElementById('status');el.style.display='';el.textContent=t;}
+
+async function loadMonth(){
+  if(!currentUser)return;
+  setStatus('Загрузка…');
+  try{
+    const snap=await docRef(currentUser.uid,storeKey(yr,mo)).get();
+    D=(snap.exists&&snap.data().json)?JSON.parse(snap.data().json):{};
+  }catch(e){D={};}
+  render();
+  setStatus('Сохранено');
+}
+function save(){
+  setStatus('Сохранение…');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(doSave,500);
+}
+async function doSave(){
+  if(!currentUser)return;
+  try{
+    await docRef(currentUser.uid,storeKey(yr,mo)).set({json:JSON.stringify(D),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    setStatus('Сохранено');
+  }catch(e){setStatus('Не удалось сохранить');}
+}
+
+function init(){
+  document.getElementById('loginBtn').addEventListener('click',()=>{
+    document.getElementById('loginError').textContent='';
+    auth.signInWithPopup(provider).catch(err=>{
+      if(err&&(err.code==='auth/popup-blocked'||err.code==='auth/cancelled-popup-request'||err.code==='auth/operation-not-supported-in-this-environment')){
+        auth.signInWithRedirect(provider).catch(err2=>{document.getElementById('loginError').textContent='Не удалось начать вход: '+err2.message;});
+      } else if(err&&err.code!=='auth/popup-closed-by-user'){
+        document.getElementById('loginError').textContent='Не удалось войти: '+err.message;
       }
     });
   });
+  document.getElementById('logoutBtn').addEventListener('click',()=>{auth.signOut();});
+  auth.getRedirectResult().catch(err=>{document.getElementById('loginError').textContent='Ошибка входа: '+err.message;});
 
-  logoutBtn.addEventListener('click', () => {
-    auth.signOut();
-  });
-
-  auth.getRedirectResult().catch(err => {
-    loginError.textContent = 'Ошибка входа: ' + err.message;
-  });
-
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      currentUser = user;
-      loginScreen.style.display = 'none';
-      appRoot.style.display = '';
-      statusEl.style.display = '';
-      userEmailEl.textContent = user.displayName ? user.displayName : (user.email || '');
-      const initial = currentMonthValue();
-      monthPicker.value = initial;
-      loadMonth(initial);
+  auth.onAuthStateChanged(user=>{
+    if(user){
+      currentUser=user;
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('appShell').style.display='';
+      document.getElementById('userEmail').textContent=user.displayName||user.email||'';
+      const n=new Date();yr=n.getFullYear();mo=n.getMonth();
+      loadMonth();
     } else {
-      currentUser = null;
-      loginScreen.style.display = 'flex';
-      appRoot.style.display = 'none';
-      statusEl.style.display = 'none';
+      currentUser=null;
+      document.getElementById('loginScreen').style.display='flex';
+      document.getElementById('appShell').style.display='none';
+      document.getElementById('status').style.display='none';
     }
   });
+}
+function goMonth(d){mo+=d;if(mo>11){mo=0;yr++;}if(mo<0){mo=11;yr--;}loadMonth();}
 
-  // ---------- App logic ----------
-  const SUBJECTS = [
-    { key: 'pdd',       label: 'ПДД',         color: '--c-pdd' },
-    { key: 'yazyk',      label: 'Язык',        color: '--c-yazyk' },
-    { key: 'kaligrafiya',label: 'Каллиграфия', color: '--c-kali' },
-    { key: 'interaktiv', label: 'Интерактив',  color: '--c-inter' },
+function showTab(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('page-'+name).classList.add('on');
+  el.classList.add('on');
+  if(name==='summary')renderSummary();
+}
+
+function render(){
+  const n=new Date();
+  const today=n.getDate();
+  const isCur=yr===n.getFullYear()&&mo===n.getMonth();
+  const dim=new Date(yr,mo+1,0).getDate();
+  document.getElementById('mLabel').textContent=MO[mo]+' '+yr;
+
+  function dayRow(){
+    let h='<div class="grid-days">';
+    for(let d=1;d<=dim;d++){
+      const t=isCur&&d===today?' today':'';
+      h+=`<div class="day-hdr${t}">${d}</div>`;
+    }
+    return h+'</div>';
+  }
+  function fut(d){return isCur&&d>today;}
+
+  // ── SLEEP ──
+  document.getElementById('lbl-sleep').innerHTML=
+    `<div class="grid-header-spacer"></div>
+     <div class="row-lbl"><span class="ic">🌙</span>засыпание</div>
+     <div class="row-lbl"><span class="ic">☀️</span>подъём</div>
+     <div class="row-lbl"><span class="ic">⏱</span>часов</div>`;
+
+  let g=dayRow();
+  g+='<div class="grid-row">';
+  for(let d=1;d<=dim;d++){
+    const v=D[`sd_${d}`]||'';
+    const f=fut(d)?' off':'';
+    g+=`<div class="cell ${v?'blue':''}${f}" onclick="openSleep(${d},'down')">${v}</div>`;
+  }
+  g+='</div>';
+  g+='<div class="grid-row">';
+  for(let d=1;d<=dim;d++){
+    const v=D[`su_${d}`]||'';
+    const h=sleepH(D[`sd_${d}`],v);
+    const cl=v?(h>=7?'green-txt':'blue'):'';
+    const f=fut(d)?' off':'';
+    g+=`<div class="cell ${cl}${f}" onclick="openSleep(${d},'up')">${v}</div>`;
+  }
+  g+='</div>';
+  g+='<div class="grid-row">';
+  for(let d=1;d<=dim;d++){
+    const h=sleepH(D[`sd_${d}`],D[`su_${d}`]);
+    const cl=h>=7?'green-txt':h>0?'blue':'';
+    const f=fut(d)?' off':'';
+    g+=`<div class="cell ${cl}${f}">${h>0?h+'ч':''}</div>`;
+  }
+  g+='</div>';
+  document.getElementById('g-sleep').innerHTML=g;
+
+  // ── HABITS ──
+  let lblH='<div class="grid-header-spacer"></div>';
+  HABITS.forEach(h=>{ lblH+=`<div class="row-lbl"><span class="ic">${h.ic}</span>${h.lbl}</div>`; });
+  document.getElementById('lbl-habits').innerHTML=lblH;
+  g=dayRow();
+  HABITS.forEach(h=>{
+    g+='<div class="grid-row">';
+    for(let d=1;d<=dim;d++){
+      const f=fut(d)?' off':'';
+      g+=`<div class="cell ${D[`${h.id}_${d}`]?'done':''}${f}" onclick="tog('${h.id}',${d})"></div>`;
+    }
+    g+='</div>';
+  });
+  document.getElementById('g-habits').innerHTML=g;
+
+  // ── WATER ──
+  document.getElementById('lbl-water').innerHTML=
+    `<div class="grid-header-spacer"></div>
+     <div class="row-lbl"><span class="ic">💧</span>стаканы</div>`;
+  g=dayRow()+'<div class="grid-row">';
+  for(let d=1;d<=dim;d++){
+    const c=D[`w_${d}`]||0;
+    const f=fut(d)?' off':'';
+    let dots='<div class="wdots">';
+    for(let i=1;i<=8;i++) dots+=`<div class="wd${i<=c?' on':''}"></div>`;
+    dots+='</div>';
+    g+=`<div class="cell${f}" onclick="openWater(${d})" style="background:var(--s1);border:1px solid var(--b1);">${dots}</div>`;
+  }
+  g+='</div>';
+  document.getElementById('g-water').innerHTML=g;
+
+  // ── DIARY ──
+  document.getElementById('lbl-diary').innerHTML=
+    `<div class="grid-header-spacer"></div>
+     <div class="row-lbl"><span class="ic">🎭</span>настроение</div>
+     <div class="row-lbl"><span class="ic">✏️</span>запись</div>`;
+  g=dayRow();
+  g+='<div class="grid-row">';
+  for(let d=1;d<=dim;d++){
+    const v=D[`dm_${d}`]||'';
+    const f=fut(d)?' off':'';
+    g+=`<div class="cell ${v?'mood-set':''}${f}" onclick="openDiary(${d})">${v}</div>`;
+  }
+  g+='</div>';
+  g+='<div class="grid-row">';
+  for(let d=1;d<=dim;d++){
+    const v=D[`dn_${d}`]||'';
+    const f=fut(d)?' off':'';
+    g+=`<div class="cell ${v?'gold':''}${f}" onclick="openDiary(${d})">${v?'✓':''}</div>`;
+  }
+  g+='</div>';
+  document.getElementById('g-diary').innerHTML=g;
+
+  // ── SUBJECTS ──
+  let lblS='<div class="grid-header-spacer"></div>';
+  SUBJ.forEach(s=>{ lblS+=`<div class="row-lbl"><span class="ic">${s.ic}</span>${s.lbl}</div>`; });
+  document.getElementById('lbl-subj').innerHTML=lblS;
+  g=dayRow();
+  SUBJ.forEach(s=>{
+    g+='<div class="grid-row">';
+    for(let d=1;d<=dim;d++){
+      const f=fut(d)?' off':'';
+      g+=`<div class="cell ${D[`${s.id}_${d}`]?'done':''}${f}" onclick="tog('${s.id}',${d})"></div>`;
+    }
+    g+='</div>';
+  });
+  document.getElementById('g-subj').innerHTML=g;
+
+  // ── LECTURES ──
+  document.getElementById('lbl-lec').innerHTML=
+    `<div class="grid-header-spacer"></div><div class="row-lbl"><span class="ic">🎓</span>тема</div>`;
+  g=dayRow()+'<div class="grid-row">';
+  for(let d=1;d<=dim;d++){
+    const has=D[`lecTitle_${d}`]||D[`lecThoughts_${d}`];
+    const f=fut(d)?' off':'';
+    g+=`<div class="cell ${has?'gold':''}${f}" onclick="openLecture(${d})">${has?'✓':''}</div>`;
+  }
+  g+='</div>';
+  document.getElementById('g-lec').innerHTML=g;
+
+  document.getElementById('themeInput').value=D.themeVal||'';
+
+  // ── BOOKS ──
+  let bH='';
+  for(let idx=0;idx<5;idx++){
+    let bg=dayRow()+'<div class="grid-row">';
+    for(let d=1;d<=dim;d++){
+      const f=fut(d)?' off':'';
+      bg+=`<div class="cell ${D[`bookRead_${idx}_${d}`]?'done':''}${f}" onclick="tog('bookRead_${idx}',${d})"></div>`;
+    }
+    bg+='</div>';
+    const hasNotes=D[`bookThoughts_${idx}`]||D[`bookDiary_${idx}`];
+    const tVal=(D[`bookTitle_${idx}`]||'').replace(/"/g,'&quot;');
+    bH+=`<div class="book-block" style="margin-bottom:18px;">
+      <input class="m-input" style="width:100%;max-width:320px;" placeholder="Название книги ${idx+1}" value="${tVal}" oninput="saveBookTitle(${idx},this.value)">
+      <div class="grid-wrap" style="margin-top:2px;">
+        <div class="grid-labels"><div class="grid-header-spacer"></div><div class="row-lbl"><span class="ic">📖</span>чтение</div></div>
+        <div class="grid-scroll"><div class="grid">${bg}</div></div>
+      </div>
+      <button type="button" onclick="openBookNotes(${idx})" style="margin-top:8px;padding:6px 12px;font-size:11px;border-radius:5px;background:var(--s1);border:1px solid var(--b2);color:var(--t2);cursor:pointer;">Заметки${hasNotes?' ✓':''}</button>
+    </div>`;
+  }
+  document.getElementById('booksWrap').innerHTML=bH;
+}
+
+// ── HELPERS ──
+function sleepH(down,up){
+  if(!down||!up)return 0;
+  try{
+    const[dh,dm]=down.split(':').map(Number);
+    const[uh,um]=up.split(':').map(Number);
+    let m=(uh*60+um)-(dh*60+dm);
+    if(m<0)m+=1440;
+    return Math.round(m/60*10)/10;
+  }catch{return 0;}
+}
+function tog(id,d){D[`${id}_${d}`]=!D[`${id}_${d}`];save();render();}
+function saveTheme(val){ if(val)D.themeVal=val; else delete D.themeVal; save(); }
+function saveBookTitle(idx,val){ if(val)D[`bookTitle_${idx}`]=val; else delete D[`bookTitle_${idx}`]; save(); }
+
+// ── MODALS ──
+function openModal(title,sub,body,c,hasDel){
+  document.getElementById('mTitle').textContent=title;
+  document.getElementById('mSub').textContent=sub;
+  document.getElementById('mBody').innerHTML=body;
+  document.getElementById('btnDel').style.display=hasDel?'block':'none';
+  ctx=c;
+  document.getElementById('overlay').classList.add('on');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('on');ctx=null;}
+function outsideClose(e){if(e.target===document.getElementById('overlay'))closeModal();}
+
+function openSleep(d,type){
+  const k=type==='down'?`sd_${d}`:`su_${d}`;
+  const v=D[k]||'';
+  const lbl=type==='down'?'Время засыпания':'Время подъёма';
+  openModal(lbl,`${MO[mo]}, ${d}`,
+    `<div class="m-lbl">Время (чч:мм)</div>
+     <input class="m-input" id="inp" type="time" value="${v}">`,
+    {t:'sleep',k},!!v);
+}
+function openWater(d){
+  const c=D[`w_${d}`]||0;
+  let opts='<div class="wpick">';
+  for(let i=1;i<=8;i++) opts+=`<div class="wp${c===i?' on':''}" onclick="selW(${i},this)">${i}</div>`;
+  opts+='</div>';
+  openModal('Вода',`${MO[mo]}, ${d}`,opts,{t:'water',d,sel:c},c>0);
+}
+function selW(n,el){
+  document.querySelectorAll('.wp').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');ctx.sel=n;
+}
+function openDiary(d){
+  const mood=D[`dm_${d}`]||'';
+  const note=D[`dn_${d}`]||'';
+  let mPick='<div class="m-lbl">Настроение</div><div class="mood-pick">';
+  MOODS.forEach(m=>{ mPick+=`<div class="mp${mood===m?' on':''}" onclick="selMood('${m}',this)">${m}</div>`; });
+  mPick+='</div>';
+  const nField=`<div class="m-lbl">Запись дня</div>
+    <textarea class="m-input" id="noteInp" placeholder="Как прошёл день…">${note}</textarea>`;
+  openModal('Дневник дня',`${MO[mo]}, ${d}`,mPick+nField,{t:'diary',d,mood,note},!!(mood||note));
+}
+function selMood(m,el){
+  document.querySelectorAll('.mp').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');ctx.mood=m;
+}
+function openLecture(d){
+  const ti=D[`lecTitle_${d}`]||'';
+  const th=D[`lecThoughts_${d}`]||'';
+  openModal('Лекция',`${MO[mo]}, ${d}`,
+    `<div class="m-lbl">Тема лекции</div><input class="m-input" id="lecTitleInp" value="${ti.replace(/"/g,'&quot;')}" placeholder="О чём была лекция">
+     <div class="m-lbl">Мысли по лекции</div><textarea class="m-input" id="lecThoughtsInp" placeholder="Что понравилось, что запомнилось, что осталось непонятным">${th}</textarea>`,
+    {t:'lecture',d},!!(ti||th));
+}
+function openBookNotes(idx){
+  const th=D[`bookThoughts_${idx}`]||'';
+  const dia=!!D[`bookDiary_${idx}`];
+  openModal(`Книга ${idx+1} · заметки`,'',
+    `<div class="m-lbl">Мысли о книге</div><textarea class="m-input" id="bookThoughtsInp" placeholder="Впечатления, любимые моменты, о чём книга">${th}</textarea>
+     <label class="m-lbl" style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="bookDiaryInp" ${dia?'checked':''} style="width:16px;height:16px;"> Есть запись в читательском дневнике</label>`,
+    {t:'booknotes',idx},!!(th||dia));
+}
+
+function saveEntry(){
+  if(!ctx)return;
+  const c=ctx;
+  if(c.t==='sleep'){
+    const v=document.getElementById('inp').value.trim();
+    if(v)D[c.k]=v;else delete D[c.k];
+  } else if(c.t==='water'){
+    const s=c.sel||0;
+    if(s)D[`w_${c.d}`]=s;else delete D[`w_${c.d}`];
+  } else if(c.t==='diary'){
+    const m=c.mood||document.querySelector('.mp.on')?.textContent||'';
+    const n=document.getElementById('noteInp').value.trim();
+    if(m)D[`dm_${c.d}`]=m;else delete D[`dm_${c.d}`];
+    if(n)D[`dn_${c.d}`]=n;else delete D[`dn_${c.d}`];
+  } else if(c.t==='lecture'){
+    const ti=document.getElementById('lecTitleInp').value.trim();
+    const th=document.getElementById('lecThoughtsInp').value.trim();
+    if(ti)D[`lecTitle_${c.d}`]=ti;else delete D[`lecTitle_${c.d}`];
+    if(th)D[`lecThoughts_${c.d}`]=th;else delete D[`lecThoughts_${c.d}`];
+  } else if(c.t==='booknotes'){
+    const th=document.getElementById('bookThoughtsInp').value.trim();
+    const dia=document.getElementById('bookDiaryInp').checked;
+    if(th)D[`bookThoughts_${c.idx}`]=th;else delete D[`bookThoughts_${c.idx}`];
+    if(dia)D[`bookDiary_${c.idx}`]=true;else delete D[`bookDiary_${c.idx}`];
+  }
+  save();closeModal();render();
+}
+function delEntry(){
+  if(!ctx)return;const c=ctx;
+  if(c.t==='sleep'){delete D[c.k];}
+  else if(c.t==='water'){delete D[`w_${c.d}`];}
+  else if(c.t==='diary'){delete D[`dm_${c.d}`];delete D[`dn_${c.d}`];}
+  else if(c.t==='lecture'){delete D[`lecTitle_${c.d}`];delete D[`lecThoughts_${c.d}`];}
+  else if(c.t==='booknotes'){delete D[`bookThoughts_${c.idx}`];delete D[`bookDiary_${c.idx}`];}
+  save();closeModal();render();
+}
+
+// ── SUMMARY ──
+function renderSummary(){
+  const n=new Date();
+  const isCur=yr===n.getFullYear()&&mo===n.getMonth();
+  const dim=new Date(yr,mo+1,0).getDate();
+  const active=isCur?n.getDate():dim;
+
+  let sleepTot=0,sleepCnt=0,sleepGood=0;
+  for(let d=1;d<=dim;d++){
+    const h=sleepH(D[`sd_${d}`],D[`su_${d}`]);
+    if(h>0){sleepTot+=h;sleepCnt++;if(h>=7)sleepGood++;}
+  }
+  const sleepAvg=sleepCnt?Math.round(sleepTot/sleepCnt*10)/10:0;
+
+  const hc={};
+  HABITS.forEach(h=>{let c=0;for(let d=1;d<=dim;d++)if(D[`${h.id}_${d}`])c++;hc[h.id]=c;});
+
+  const sc2={};
+  SUBJ.forEach(s=>{let c=0;for(let d=1;d<=dim;d++)if(D[`${s.id}_${d}`])c++;sc2[s.id]=c;});
+
+  let lecCount=0;for(let d=1;d<=dim;d++)if(D[`lecTitle_${d}`]||D[`lecThoughts_${d}`])lecCount++;
+  let booksActive=0;for(let idx=0;idx<5;idx++)if(D[`bookTitle_${idx}`])booksActive++;
+
+  let wDays=0,wTot=0;
+  for(let d=1;d<=dim;d++){const c=D[`w_${d}`]||0;wTot+=c;if(c>=8)wDays++;}
+
+  const mMap={'😞':1,'😕':2,'😐':3,'🙂':4,'😊':5};
+  let mTot=0,mCnt=0,mDist={1:0,2:0,3:0,4:0,5:0};
+  let noteDays=0;
+  for(let d=1;d<=dim;d++){
+    const m=D[`dm_${d}`];if(m&&mMap[m]){mTot+=mMap[m];mCnt++;mDist[mMap[m]]++;}
+    if(D[`dn_${d}`])noteDays++;
+  }
+  const mAvg=mCnt?Math.round(mTot/mCnt*10)/10:0;
+  const mEmoji=mAvg>=4.5?'😊':mAvg>=3.5?'🙂':mAvg>=2.5?'😐':mAvg>0?'😕':'—';
+
+  const cards=[
+    {l:'Сон · среднее',v:sleepAvg||'—',u:sleepAvg?'ч':'',s:`${sleepGood} дней ≥7ч`,pct:Math.min(100,sleepAvg/9*100)},
+    {l:'Зарядка',v:hc.charge,u:'дней',s:`из ${active}`,pct:hc.charge/active*100},
+    {l:'Трезвость',v:hc.sober,u:'дней',s:`из ${active}`,pct:hc.sober/active*100},
+    {l:'Тренировки',v:hc.workout,u:'раз',s:'за месяц',pct:hc.workout/20*100},
+    {l:'Саморазвитие',v:hc.selfdev,u:'дней',s:`из ${active}`,pct:hc.selfdev/active*100},
+    {l:'Вода · норма',v:wDays,u:'дней',s:`стаканов всего: ${wTot}`,pct:wDays/active*100},
+    {l:'Настроение · средн.',v:mEmoji,u:mAvg?` ${mAvg}/5`:'',s:`${mCnt} оценок`,pct:mAvg/5*100},
+    {l:'Записей в дневнике',v:noteDays,u:'дней',s:'',pct:noteDays/active*100},
+    {l:'ПДД',v:sc2.subj_pdd,u:'дней',s:`из ${active}`,pct:sc2.subj_pdd/active*100},
+    {l:'Язык',v:sc2.subj_yaz,u:'дней',s:`из ${active}`,pct:sc2.subj_yaz/active*100},
+    {l:'Каллиграфия',v:sc2.subj_kal,u:'дней',s:`из ${active}`,pct:sc2.subj_kal/active*100},
+    {l:'Интерактив',v:sc2.subj_int,u:'дней',s:`из ${active}`,pct:sc2.subj_int/active*100},
+    {l:'Лекции',v:lecCount,u:'шт',s:`за месяц`,pct:lecCount/dim*100},
+    {l:'Книги в работе',v:booksActive,u:'из 5',s:'',pct:booksActive/5*100},
   ];
 
-  const monthPicker = document.getElementById('monthPicker');
-  const themeInput = document.getElementById('themeInput');
-  const monthLabelEl = document.getElementById('monthLabel');
-  const subjectsContainer = document.getElementById('subjectsContainer');
-  const lekStrip = document.getElementById('lekStrip');
-  const lekCountEl = document.getElementById('lekCount');
-  const lectureEditor = document.getElementById('lectureEditor');
-  const lectureEditorDay = document.getElementById('lectureEditorDay');
-  const lectureTitleInput = document.getElementById('lectureTitleInput');
-  const lectureThoughtsInput = document.getElementById('lectureThoughtsInput');
-  const lectureDeleteBtn = document.getElementById('lectureDeleteBtn');
-  const booksContainer = document.getElementById('booksContainer');
+  document.getElementById('statsGrid').innerHTML=cards.map(c=>`
+    <div class="sc">
+      <div class="sc-lbl">${c.l}</div>
+      <div class="sc-val">${c.v}<span class="u">${c.u}</span></div>
+      <div class="sc-sub">${c.s}</div>
+      <div class="sc-bar"><div class="sc-fill" style="width:${Math.min(100,Math.max(0,c.pct||0))}%"></div></div>
+    </div>`).join('');
 
-  let data = null;
-  let days = 30;
-  let monthValue = '';
-  let saveTimer = null;
-  let ready = false;
-  let selectedLectureDay = null;
+  const mNames=['очень плохо','плохо','нейтрально','хорошо','отлично'];
+  const mDistStr=Object.entries(mDist).map(([k,v])=>`${mNames[k-1]}: ${v} дн.`).join(', ');
 
-  function pad(n){ return String(n).padStart(2,'0'); }
+  document.getElementById('exportTxt').textContent=
+`=== ОТЧЁТ ДАНИИЛА · ${MO[mo].toUpperCase()} ${yr} ===
+Дней в отслеживании: ${active} из ${dim}
 
-  function daysInMonth(value){
-    const [y, m] = value.split('-').map(Number);
-    return new Date(y, m, 0).getDate();
-  }
+СОН
+• Среднее: ${sleepAvg||'н/д'} ч
+• Дней с нормальным сном (≥7ч): ${sleepGood}
+• Всего записей: ${sleepCnt}
 
-  function isWeekend(value, dayNum){
-    const [y, m] = value.split('-').map(Number);
-    const d = new Date(y, m - 1, dayNum);
-    const wd = d.getDay();
-    return wd === 0 || wd === 6;
-  }
+ПРИВЫЧКИ
+• Зарядка: ${hc.charge}/${active} дн.
+• Трезвость: ${hc.sober}/${active} дн.
+• Тренировки: ${hc.workout} раз
+• Саморазвитие: ${hc.selfdev}/${active} дн.
 
-  function defaultData(n){
-    return {
-      theme: '',
-      habits: {
-        pdd: Array(n).fill(false),
-        yazyk: Array(n).fill(false),
-        kaligrafiya: Array(n).fill(false),
-        interaktiv: Array(n).fill(false),
-      },
-      lectures: {},
-      books: Array.from({ length: 5 }, () => ({ title: '', thoughts: '', diary: false, checks: Array(n).fill(false) }))
-    };
-  }
+ВОДА
+• Дней с нормой (≥8 ст.): ${wDays}/${active}
+• Всего стаканов: ${wTot}
 
-  function resizeArray(arr, n){
-    arr = Array.isArray(arr) ? arr.slice(0, n) : [];
-    while (arr.length < n) arr.push(false);
-    return arr;
-  }
+ДНЕВНИК
+• Среднее настроение: ${mAvg||'н/д'}/5
+• Распределение: ${mDistStr}
+• Дней с записями: ${noteDays}
 
-  function normalize(d, n){
-    if (typeof d.theme !== 'string') d.theme = '';
-    d.habits = d.habits || {};
-    ['pdd','yazyk','kaligrafiya','interaktiv'].forEach(k => {
-      d.habits[k] = resizeArray(d.habits[k], n);
-    });
+УЧЕБНЫЙ ПЛАН
+• Тема месяца: ${D.themeVal||'не указана'}
+• ПДД: ${sc2.subj_pdd}/${active} дн.
+• Язык: ${sc2.subj_yaz}/${active} дн.
+• Каллиграфия: ${sc2.subj_kal}/${active} дн.
+• Интерактив: ${sc2.subj_int}/${active} дн.
+• Лекций записано: ${lecCount}
+• Книг в работе: ${booksActive}/5
 
-    // migrate old freeform lecture list (array) into a day-keyed object
-    if (Array.isArray(d.lectures)) {
-      const oldList = d.lectures;
-      const checkedDays = Array.isArray(d.habits.lekcii)
-        ? d.habits.lekcii.map((v, i) => (v ? i + 1 : null)).filter(x => x)
-        : [];
-      const migrated = {};
-      let idx = 0;
-      checkedDays.forEach(day => {
-        if (idx < oldList.length) migrated[day] = { title: oldList[idx].title || '', thoughts: oldList[idx].thoughts || '' };
-        idx++;
-      });
-      let nextDay = (checkedDays.length ? Math.max(...checkedDays) : 0) + 1;
-      while (idx < oldList.length && nextDay <= n) {
-        if (!migrated[nextDay]) { migrated[nextDay] = { title: oldList[idx].title || '', thoughts: oldList[idx].thoughts || '' }; idx++; }
-        nextDay++;
-      }
-      d.lectures = migrated;
+---
+Запрос: Проанализируй данные трекера привычек и учебного плана Даниила за ${MO[mo]} ${yr}. Выяви закономерности между сном, активностью, учёбой и настроением. Укажи сильные стороны и зоны роста. Дай конкретные рекомендации на следующий месяц.`;
+}
+
+function copyExport(){
+  const text=document.getElementById('exportTxt').textContent;
+  const b=document.querySelector('.export-btn');
+  const ok=()=>{b.textContent='Скопировано ✓';setTimeout(()=>b.textContent='Скопировать',2000);};
+  const fallback=()=>{
+    try{
+      const ta=document.createElement('textarea');
+      ta.value=text;
+      ta.style.position='fixed';
+      ta.style.opacity='0';
+      document.body.appendChild(ta);
+      ta.focus();ta.select();
+      const success=document.execCommand('copy');
+      document.body.removeChild(ta);
+      if(success)ok();
+      else b.textContent='Не удалось скопировать — выделите текст вручную';
+    }catch(e){
+      b.textContent='Не удалось скопировать — выделите текст вручную';
     }
-    delete d.habits.lekcii;
-    if (typeof d.lectures !== 'object' || d.lectures === null) d.lectures = {};
-    const cleanedLectures = {};
-    Object.keys(d.lectures).forEach(k => {
-      const dayNum = parseInt(k, 10);
-      if (dayNum >= 1 && dayNum <= n) {
-        const v = d.lectures[k] || {};
-        cleanedLectures[dayNum] = {
-          title: typeof v.title === 'string' ? v.title : '',
-          thoughts: typeof v.thoughts === 'string' ? v.thoughts : ''
-        };
-      }
-    });
-    d.lectures = cleanedLectures;
-
-    if (!Array.isArray(d.books)) d.books = [];
-    while (d.books.length < 5) d.books.push({ title: '', thoughts: '', diary: false, checks: Array(n).fill(false) });
-    d.books = d.books.slice(0, 5).map(b => ({
-      title: typeof b.title === 'string' ? b.title : '',
-      thoughts: typeof b.thoughts === 'string' ? b.thoughts : '',
-      diary: !!b.diary,
-      checks: resizeArray(b.checks, n)
-    }));
-    return d;
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(ok).catch(fallback);
+  } else {
+    fallback();
   }
+}
 
-  function setStatus(text){ statusEl.textContent = text; }
-
-  function docRef(uid, value){
-    return db.collection('users').doc(uid).collection('months').doc(value);
-  }
-
-  function scheduleSave(){
-    setStatus('Сохранение…');
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(doSave, 500);
-  }
-
-  async function doSave(){
-    if (!ready || !currentUser) return;
-    try {
-      await docRef(currentUser.uid, monthValue).set({
-        json: JSON.stringify(data),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      setStatus('Сохранено');
-    } catch (e) {
-      setStatus('Не удалось сохранить');
-    }
-  }
-
-  function flushSave(){
-    clearTimeout(saveTimer);
-    doSave();
-  }
-
-  function makeDayStrip(container, values, onToggle, accentVar){
-    container.innerHTML = '';
-    for (let i = 0; i < days; i++){
-      const dayNum = i + 1;
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'day-cell' + (values[i] ? ' checked' : '') + (isWeekend(monthValue, dayNum) ? ' weekend' : '');
-      btn.style.setProperty('--accent', `var(${accentVar})`);
-      btn.textContent = dayNum;
-      btn.setAttribute('aria-pressed', values[i] ? 'true' : 'false');
-      btn.addEventListener('click', () => {
-        values[i] = !values[i];
-        btn.classList.toggle('checked', values[i]);
-        btn.setAttribute('aria-pressed', values[i] ? 'true' : 'false');
-        onToggle();
-        doSave();
-      });
-      container.appendChild(btn);
-    }
-  }
-
-  function countChecked(arr){ return arr.filter(Boolean).length; }
-
-  function renderSubjects(){
-    subjectsContainer.innerHTML = '';
-    SUBJECTS.forEach(subj => {
-      const card = document.createElement('div');
-      card.className = 'subject-card';
-      card.style.setProperty('--accent', `var(${subj.color})`);
-
-      const head = document.createElement('div');
-      head.className = 'subject-head';
-      const name = document.createElement('span');
-      name.className = 'subject-name';
-      name.textContent = subj.label;
-      const count = document.createElement('span');
-      count.className = 'subject-count';
-      head.appendChild(name);
-      head.appendChild(count);
-
-      const strip = document.createElement('div');
-      strip.className = 'strip';
-
-      card.appendChild(head);
-      card.appendChild(strip);
-      subjectsContainer.appendChild(card);
-
-      const values = data.habits[subj.key];
-      const updateCount = () => { count.textContent = `${countChecked(values)} из ${days}`; };
-      makeDayStrip(strip, values, updateCount, subj.color);
-      updateCount();
-    });
-  }
-
-  function lectureHasContent(entry){
-    return !!(entry && ((entry.title && entry.title.trim()) || (entry.thoughts && entry.thoughts.trim())));
-  }
-
-  function renderLectures(){
-    lekStrip.innerHTML = '';
-    let filled = 0;
-    for (let i = 0; i < days; i++){
-      const dayNum = i + 1;
-      const entry = data.lectures[dayNum];
-      const has = lectureHasContent(entry);
-      if (has) filled++;
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'day-cell'
-        + (has ? ' checked' : '')
-        + (isWeekend(monthValue, dayNum) ? ' weekend' : '')
-        + (selectedLectureDay === dayNum ? ' selected' : '');
-      btn.style.setProperty('--accent', 'var(--c-lek)');
-      btn.textContent = dayNum;
-      btn.addEventListener('click', () => openLectureDay(dayNum));
-      lekStrip.appendChild(btn);
-    }
-    lekCountEl.textContent = `${filled} из ${days}`;
-  }
-
-  function openLectureDay(dayNum){
-    selectedLectureDay = dayNum;
-    const entry = data.lectures[dayNum] || { title: '', thoughts: '' };
-    lectureEditor.style.display = '';
-    lectureEditorDay.textContent = `День ${dayNum}`;
-    lectureTitleInput.value = entry.title || '';
-    lectureThoughtsInput.value = entry.thoughts || '';
-    renderLectures();
-  }
-
-  function updateLectureEntry(){
-    if (selectedLectureDay == null) return;
-    if (!data.lectures[selectedLectureDay]) data.lectures[selectedLectureDay] = { title: '', thoughts: '' };
-    data.lectures[selectedLectureDay].title = lectureTitleInput.value;
-    data.lectures[selectedLectureDay].thoughts = lectureThoughtsInput.value;
-  }
-
-  function cleanupEmptyLectureEntry(){
-    if (selectedLectureDay == null) return;
-    if (!lectureHasContent(data.lectures[selectedLectureDay])) delete data.lectures[selectedLectureDay];
-    renderLectures();
-  }
-
-  lectureTitleInput.addEventListener('input', () => { updateLectureEntry(); renderLectures(); scheduleSave(); });
-  lectureTitleInput.addEventListener('blur', () => { cleanupEmptyLectureEntry(); flushSave(); });
-  lectureThoughtsInput.addEventListener('input', () => { updateLectureEntry(); renderLectures(); scheduleSave(); });
-  lectureThoughtsInput.addEventListener('blur', () => { cleanupEmptyLectureEntry(); flushSave(); });
-
-  lectureDeleteBtn.addEventListener('click', () => {
-    if (selectedLectureDay == null) return;
-    delete data.lectures[selectedLectureDay];
-    lectureTitleInput.value = '';
-    lectureThoughtsInput.value = '';
-    renderLectures();
-    doSave();
-  });
-
-  function renderBooks(){
-    booksContainer.innerHTML = '';
-    data.books.forEach((book, idx) => {
-      const card = document.createElement('div');
-      card.className = 'book-card';
-
-      const head = document.createElement('div');
-      head.className = 'book-head';
-      const num = document.createElement('span');
-      num.className = 'book-num';
-      num.textContent = String(idx + 1);
-      const titleInput = document.createElement('input');
-      titleInput.type = 'text';
-      titleInput.placeholder = 'Название книги';
-      titleInput.value = book.title;
-      titleInput.style.flex = '1';
-      titleInput.addEventListener('input', () => { book.title = titleInput.value; scheduleSave(); });
-      titleInput.addEventListener('blur', flushSave);
-      head.appendChild(num);
-      head.appendChild(titleInput);
-
-      const stripLabel = document.createElement('label');
-      stripLabel.className = 'field-label';
-      stripLabel.textContent = 'Дни чтения';
-      const strip = document.createElement('div');
-      strip.className = 'strip';
-
-      const thoughtsLabel = document.createElement('label');
-      thoughtsLabel.className = 'field-label';
-      thoughtsLabel.textContent = 'Мысли о книге';
-      const thoughtsArea = document.createElement('textarea');
-      thoughtsArea.value = book.thoughts;
-      thoughtsArea.placeholder = 'Впечатления, любимые моменты, о чём книга';
-      thoughtsArea.addEventListener('input', () => { book.thoughts = thoughtsArea.value; scheduleSave(); });
-      thoughtsArea.addEventListener('blur', flushSave);
-
-      const checkboxRow = document.createElement('label');
-      checkboxRow.className = 'checkbox-row';
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = book.diary;
-      checkbox.addEventListener('change', () => { book.diary = checkbox.checked; doSave(); });
-      const checkboxText = document.createElement('span');
-      checkboxText.textContent = 'Есть запись в читательском дневнике';
-      checkboxRow.appendChild(checkbox);
-      checkboxRow.appendChild(checkboxText);
-
-      card.appendChild(head);
-      card.appendChild(stripLabel);
-      card.appendChild(strip);
-      card.appendChild(thoughtsLabel);
-      card.appendChild(thoughtsArea);
-      card.appendChild(checkboxRow);
-      booksContainer.appendChild(card);
-
-      makeDayStrip(strip, book.checks, () => {}, '--c-book');
-    });
-  }
-
-  function renderAll(){
-    themeInput.value = data.theme;
-    const [y, m] = monthValue.split('-').map(Number);
-    const formatted = new Date(y, m - 1, 1).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
-    monthLabelEl.textContent = formatted.charAt(0).toUpperCase() + formatted.slice(1);
-    renderSubjects();
-    renderLectures();
-    renderBooks();
-  }
-
-  async function loadMonth(value){
-    if (!currentUser) return;
-    ready = false;
-    setStatus('Загрузка…');
-    const n = daysInMonth(value);
-    let d;
-    try {
-      const snap = await docRef(currentUser.uid, value).get();
-      d = snap.exists && snap.data().json ? JSON.parse(snap.data().json) : defaultData(n);
-    } catch (e) {
-      d = defaultData(n);
-    }
-    d = normalize(d, n);
-    data = d;
-    days = n;
-    monthValue = value;
-    selectedLectureDay = null;
-    lectureEditor.style.display = 'none';
-    renderAll();
-    ready = true;
-    setStatus('Сохранено');
-  }
-
-  function currentMonthValue(){
-    const now = new Date();
-    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
-  }
-
-  monthPicker.addEventListener('change', () => {
-    flushSave();
-    loadMonth(monthPicker.value);
-  });
-
-  themeInput.addEventListener('input', () => { data.theme = themeInput.value; scheduleSave(); });
-  themeInput.addEventListener('blur', flushSave);
-})();
+init();
 </script>
 </body>
 </html>
