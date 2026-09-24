@@ -202,7 +202,10 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 .hold b{display:block;font-weight:400;font-style:italic;font-size:28px;margin-bottom:8px;}
 .hold span{color:var(--t2);font-size:17px;}
 :root[data-prof="dasha"]{--bg:#fdf3f5;--s1:#ffffff;--s2:#f8e9ed;--b1:#efdde2;--b2:#e2c9d0;--t1:#1a1a1a;--t2:#666;--t3:#999;}
-:root[data-prof="dasha"] #page-tracker>.sec,:root[data-prof="dasha"] #page-study>.sec,:root[data-prof="dasha"] #page-summary>*:not(.hold){display:none;}
+:root[data-prof="dasha"] #page-summary>*:not(.hold){display:none;}
+.ds-only{display:none;}
+:root[data-prof="dasha"] .ds-only{display:block;}
+:root[data-prof="dasha"] .dn-only{display:none;}
 :root[data-prof="dasha"] .hold{display:block;}
 </style>
 </head>
@@ -250,7 +253,6 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 <div class="main">
 
   <div class="page on" id="page-tracker">
-    <div class="hold"><b>здесь пока пусто</b><span>сюда добавим твои пункты — напиши, что хочешь отслеживать</span></div>
     <div class="sec"><div class="sec-lbl">Сон</div>
       <div class="grid-wrap">
         <div class="grid-labels" id="lbl-sleep"></div>
@@ -263,13 +265,19 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
         <div class="grid-scroll"><div class="grid" id="g-habits"></div></div>
       </div>
     </div>
-    <div class="sec"><div class="sec-lbl">АН</div>
+    <div class="sec ds-only"><div class="sec-lbl">Питание</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-food"></div>
+        <div class="grid-scroll"><div class="grid" id="g-food"></div></div>
+      </div>
+    </div>
+    <div class="sec dn-only"><div class="sec-lbl">АН</div>
       <div class="grid-wrap">
         <div class="grid-labels" id="lbl-an"></div>
         <div class="grid-scroll"><div class="grid" id="g-an"></div></div>
       </div>
     </div>
-    <div class="sec"><div class="sec-lbl">Духовное</div>
+    <div class="sec dn-only"><div class="sec-lbl">Духовное</div>
       <div class="grid-wrap">
         <div class="grid-labels" id="lbl-spirit"></div>
         <div class="grid-scroll"><div class="grid" id="g-spirit"></div></div>
@@ -296,7 +304,6 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
   </div>
 
   <div class="page" id="page-study">
-    <div class="hold"><b>здесь пока пусто</b><span>сюда добавим твои пункты — напиши, что хочешь отслеживать</span></div>
     <div class="sec">
       <div style="margin-bottom:16px;">
         <div class="m-lbl">Тема месяца</div>
@@ -317,6 +324,7 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 
       <div class="sec-lbl" style="margin-top:18px;">Книги месяца</div>
       <div id="booksWrap"></div>
+      <div class="ds-only"><div class="sec-lbl" style="margin-top:18px;">Курсы</div><div id="coursesWrap"></div></div>
     </div>
   </div>
 
@@ -392,22 +400,22 @@ const provider = new firebase.auth.GoogleAuthProvider();
 let currentUser = null;
 
 const MO = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-const HABITS = [
+let HABITS = [
   {id:'charge',  ic:'⚡', lbl:'Зарядка'},
   {id:'sober',   ic:'🚫', lbl:'Трезвость'},
   {id:'workout', ic:'🏋️', lbl:'Тренировка'},
   {id:'selfdev', ic:'🌱', lbl:'Саморазвитие'},
 ];
-const SPIRIT = [
+let SPIRIT = [
   {id:'bible',    ic:'📖', lbl:'Чтение Библии'},
   {id:'meditate', ic:'🧘', lbl:'Медитация'},
 ];
-const AN = [
+let AN = [
   {id:'an_group', ic:'🤝', lbl:'Группа'},
   {id:'an_book',  ic:'📘', lbl:'Чтение книги'},
   {id:'an_steps', ic:'🔢', lbl:'12 шагов'},
 ];
-const SUBJ = [
+let SUBJ = [
   {id:'subj_pdd',  ic:'🚗', lbl:'ПДД'},
   {id:'subj_yaz',  ic:'🗣️', lbl:'Язык'},
   {id:'subj_kal',  ic:'✍️', lbl:'Каллиграфия'},
@@ -636,6 +644,22 @@ function render(){
   g+='</div>';
   document.getElementById('g-diary').innerHTML=g;
 
+  // ── FOOD (Даша) ──
+  document.getElementById('lbl-food').innerHTML=
+    `<div class="grid-header-spacer"></div>
+     <div class="row-lbl"><span class="ic">🍽</span>в норме</div>
+     <div class="row-lbl"><span class="ic">🔥</span>ккал</div>
+     <div class="row-lbl"><span class="ic">🍔</span>фастфуд</div>`;
+  g=dayRow();
+  g+='<div class="grid-row">';
+  for(let d=1;d<=dim;d++){const f=fut(d)?' off':'';g+=`<div class="cell ${D[`nok_${d}`]?'done':''}${f}" onclick="openFood(${d})"></div>`;}
+  g+='</div><div class="grid-row">';
+  for(let d=1;d<=dim;d++){const v=D[`nk_${d}`]||'';const f=fut(d)?' off':'';g+=`<div class="cell ${v?'gold':''}${f}" onclick="openFood(${d})">${v}</div>`;}
+  g+='</div><div class="grid-row">';
+  for(let d=1;d<=dim;d++){const f=fut(d)?' off':'';g+=`<div class="cell ${D[`nf_${d}`]?'red':''}${f}" onclick="openFood(${d})">${D[`nf_${d}`]?'✓':''}</div>`;}
+  g+='</div>';
+  document.getElementById('g-food').innerHTML=g;
+
   // ── SUBJECTS ──
   let lblS='<div class="grid-header-spacer"></div>';
   SUBJ.forEach(s=>{ lblS+=`<div class="row-lbl"><span class="ic">${s.ic}</span>${s.lbl}</div>`; });
@@ -676,6 +700,16 @@ function render(){
     </div>`;
   }
   document.getElementById('booksWrap').innerHTML=bH;
+  let cH='';
+  for(let idx=0;idx<2;idx++){
+    const has=D[`courseNotes_${idx}`];
+    const tv=(D[`courseTitle_${idx}`]||'').replace(/"/g,'&quot;');
+    cH+=`<div class="book-block" style="margin-bottom:12px;">
+      <input class="m-input" style="width:100%;max-width:320px;margin-bottom:6px;" placeholder="Название курса ${idx+1}" value="${tv}" oninput="saveCourseTitle(${idx},this.value)">
+      <button type="button" onclick="openCourseNotes(${idx})" style="padding:6px 12px;font-size:11px;border-radius:5px;background:var(--s1);border:1px solid var(--b2);color:var(--t2);cursor:pointer;">Заметки${has?' ✓':''}</button>
+    </div>`;
+  }
+  document.getElementById('coursesWrap').innerHTML=cH;
 
   renderPlanner();
 }
@@ -861,6 +895,14 @@ function saveEntry(){
     const dia=document.getElementById('bookDiaryInp').checked;
     if(th)D[`bookThoughts_${c.idx}`]=th;else delete D[`bookThoughts_${c.idx}`];
     if(dia)D[`bookDiary_${c.idx}`]=true;else delete D[`bookDiary_${c.idx}`];
+  } else if(c.t==='coursenotes'){
+    const th=document.getElementById('courseNotesInp').value.trim();
+    if(th)D[`courseNotes_${c.idx}`]=th;else delete D[`courseNotes_${c.idx}`];
+  } else if(c.t==='food'){
+    const k=parseInt(document.getElementById('kcalInp').value,10);
+    if(k>0)D[`nk_${c.d}`]=k;else delete D[`nk_${c.d}`];
+    if(document.getElementById('foodOk').checked)D[`nok_${c.d}`]=true;else delete D[`nok_${c.d}`];
+    if(document.getElementById('foodFast').checked)D[`nf_${c.d}`]=true;else delete D[`nf_${c.d}`];
   }
   save();closeModal();render();
 }
@@ -871,6 +913,8 @@ function delEntry(){
   else if(c.t==='diary'){delete D[`dm_${c.d}`];delete D[`dn_${c.d}`];}
   else if(c.t==='lecture'){delete D[`lecTitle_${c.d}`];delete D[`lecThoughts_${c.d}`];}
   else if(c.t==='booknotes'){delete D[`bookThoughts_${c.idx}`];delete D[`bookDiary_${c.idx}`];}
+  else if(c.t==='coursenotes'){delete D[`courseNotes_${c.idx}`];}
+  else if(c.t==='food'){delete D[`nk_${c.d}`];delete D[`nok_${c.d}`];delete D[`nf_${c.d}`];}
   save();closeModal();render();
 }
 
@@ -1110,7 +1154,28 @@ function gMonth(i,k){G[i].month=G[i].month===k?-1:k;saveDoc('goals_'+gy,G);rende
 function gDel(i){if(confirm('Удалить цель?')){G.splice(i,1);saveDoc('goals_'+gy,G);renderGoals();}}
 function addGoal(){if(!G)return;G.push(mkG());saveDoc('goals_'+gy,G);renderGoals();}
 
+const DA_HABITS=[{id:'charge',ic:'⚡',lbl:'Зарядка'},{id:'pills',ic:'💊',lbl:'Таблетки'},{id:'workout',ic:'🏋️',lbl:'Тренировка'},{id:'meditate',ic:'🧘',lbl:'Медитация'}];
+const DA_SUBJ=[{id:'subj_pdd',ic:'🚗',lbl:'ПДД'},{id:'subj_yaz',ic:'🗣️',lbl:'Язык'},{id:'subj_kal',ic:'✍️',lbl:'Каллиграфия'},{id:'subj_book',ic:'📝',lbl:'Написание книги'},{id:'subj_hob',ic:'🎨',lbl:'Хобби'}];
+const H0=HABITS,A0=AN,S0=SPIRIT,U0=SUBJ;
+function openFood(d){
+  const k=D[`nk_${d}`]||'';
+  openModal('Питание',`${MO[mo]}, ${d}`,
+    `<div class="m-lbl">Калории</div>
+     <input class="m-input" id="kcalInp" type="number" inputmode="numeric" value="${k}" placeholder="сколько ккал" style="width:100%;">
+     <label class="m-lbl" style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="foodOk" ${D[`nok_${d}`]?'checked':''} style="width:16px;height:16px;"> Уложилась в норму</label>
+     <label class="m-lbl" style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="foodFast" ${D[`nf_${d}`]?'checked':''} style="width:16px;height:16px;"> Был фастфуд</label>`,
+    {t:'food',d},!!(k||D[`nok_${d}`]||D[`nf_${d}`]));
+}
+function openCourseNotes(idx){
+  const th=D[`courseNotes_${idx}`]||'';
+  openModal(`Курс ${idx+1} · заметки`,'',
+    `<div class="m-lbl">Заметки по курсу</div><textarea class="m-input" id="courseNotesInp" placeholder="Что прошла, что понравилось, что дальше">${th}</textarea>`,
+    {t:'coursenotes',idx},!!th);
+}
+function saveCourseTitle(idx,val){ if(val)D[`courseTitle_${idx}`]=val; else delete D[`courseTitle_${idx}`]; save(); }
 function applyProf(){
+  const dd=prof==='dasha';
+  HABITS=dd?DA_HABITS:H0;AN=dd?[]:A0;SPIRIT=dd?[]:S0;SUBJ=dd?DA_SUBJ:U0;
   document.documentElement.dataset.prof=prof;
   document.querySelector('.hdr-name').textContent=prof==='dasha'?'Даша':'ДАНИИЛ';
   document.querySelectorAll('.prof button').forEach(b=>b.classList.toggle('on',b.dataset.p===prof));
