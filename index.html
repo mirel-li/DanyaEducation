@@ -151,8 +151,8 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 .pday .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);margin-top:3px;}
 
 .plan-item{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:12px;margin-bottom:10px;}
-.plan-item .row2{display:flex;gap:8px;margin-top:2px;}
-.plan-item .row2>div{flex:1 1 0;min-width:0;}
+.plan-item .row2{display:grid;grid-template-columns:120px 1fr;gap:8px;margin-top:2px;}
+.plan-item .row2>div{min-width:0;}
 .addbtn{background:none;border:1px dashed var(--b2);color:var(--t3);border-radius:8px;width:100%;padding:9px;font-size:12px;cursor:pointer;margin-top:2px;font-family:'Inter',sans-serif;}
 .addbtn:hover{border-color:var(--gold);color:var(--gold);}
 
@@ -164,6 +164,29 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 :root[data-theme="dark"] {
   --bg:#141414;--s1:#1c1c1c;--s2:#202020;--b1:#2c2c2c;--b2:#3a3a3a;--t1:#eee;--t2:#aaa;--t3:#777;
 }
+.tabs{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
+.tab{flex-shrink:0;}
+.pj{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:12px;overflow:hidden;}
+.pj-h{padding:14px 16px 12px;border-bottom:1px solid var(--b1);}
+.pj-top{display:flex;gap:12px;align-items:center;}
+.pi{flex:1;min-width:0;width:100%;background:transparent;border:0;outline:0;color:var(--t1);font-family:'Inter',sans-serif;font-size:13px;padding:6px 0;}
+.pi::placeholder{color:var(--t3);}
+.pj-name{font-weight:600;font-size:15px;}
+.pj-pct{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;color:var(--gold);}
+.pj-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;flex-wrap:wrap;}
+.pd{background:var(--s2);border:1px solid var(--b1);border-radius:5px;color:var(--t2);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 6px;outline:none;}
+.pd.late{border-color:var(--red);color:var(--red);}
+.tk{display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid var(--b1);}
+.tk .cell{flex-shrink:0;}
+.tk .pd{max-width:112px;flex-shrink:0;}
+.tk.done .pi{color:var(--t3);text-decoration:line-through;}
+.xb{background:none;border:0;color:var(--t3);cursor:pointer;font-size:16px;padding:2px 6px;font-family:inherit;}
+.xb:hover{color:var(--red);}
+.pj .addbtn{width:calc(100% - 32px);margin:10px 16px 14px;}
+.g-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:12px 0 8px;}
+.gm{height:30px;border-radius:5px;background:var(--s2);border:1px solid var(--b1);color:var(--t3);font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;padding:0;}
+.gm.on{background:var(--green-d);border-color:var(--green);color:var(--green);}
+.gm.now{border-color:var(--gold);color:var(--gold);}
 </style>
 </head>
 <body>
@@ -202,6 +225,8 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
   <div class="tab" onclick="showTab('study',this)">Обучение</div>
   <div class="tab" onclick="showTab('planner',this)">План</div>
   <div class="tab" onclick="showTab('summary',this)">Итоги</div>
+  <div class="tab" onclick="showTab('projects',this)">Проекты</div>
+  <div class="tab" onclick="showTab('goals',this)">Цели</div>
 </div>
 
 <div class="main">
@@ -282,6 +307,21 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
       <div class="export-txt" id="exportTxt"></div>
       <button class="export-btn" onclick="copyExport()">Скопировать</button>
     </div>
+  </div>
+
+  <div class="page" id="page-projects">
+    <div class="stats"><div class="sc"><div class="sc-lbl">Общий прогресс</div><div class="sc-val" id="pjTot">0<span class="u">%</span></div><div class="sc-bar"><div class="sc-fill" id="pjTotBar" style="width:0"></div></div></div></div>
+    <div id="pjList"></div>
+  </div>
+
+  <div class="page" id="page-goals">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="nav"><button onclick="goalYear(-1)">‹</button><button onclick="goalYear(1)">›</button></div>
+      <span class="hdr-month" id="gyLabel"></span>
+    </div>
+    <div class="stats" id="glStats"></div>
+    <div id="glList"></div>
+    <button class="addbtn" onclick="addGoal()">+ добавить цель</button>
   </div>
 
   <div class="page" id="page-planner">
@@ -424,6 +464,8 @@ function showTab(name,el){
   document.getElementById('page-'+name).classList.add('on');
   el.classList.add('on');
   if(name==='summary')renderSummary();
+  if(name==='projects')loadProjects();
+  if(name==='goals')loadGoals();
 }
 
 function render(){
@@ -656,7 +698,7 @@ function renderPlanEditor(d){
       <div class="row2">
         <div>
           <div class="m-lbl">Время</div>
-          <input class="m-input" type="time" style="margin-bottom:0;width:100%;" value="${it.time||''}" oninput="updatePlanField(${d},${idx},'time',this.value)">
+          <input class="m-input" type="time" style="margin-bottom:0;width:100%;box-sizing:border-box;" value="${it.time||''}" oninput="updatePlanField(${d},${idx},'time',this.value)">
         </div>
         <div>
           <div class="m-lbl">Локация</div>
@@ -964,6 +1006,85 @@ function copyExport(){
     fallback();
   }
 }
+
+// ── ПРОЕКТЫ И ЦЕЛИ ──
+const MS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+let P=null,pUid=null,G=null,gUid=null,gy=new Date().getFullYear();const T={};
+const esc2=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const todayS=()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');};
+const isLate=(d,done)=>!!d&&!done&&d<todayS();
+async function loadDoc(key,make){
+  try{const s=await docRef(currentUser.uid,key).get();
+    return (s.exists&&s.data().json)?JSON.parse(s.data().json):make();
+  }catch(e){setStatus('Не удалось загрузить');return null;}
+}
+function saveDoc(key,val){
+  setStatus('Сохранение…');clearTimeout(T[key]);
+  T[key]=setTimeout(async()=>{
+    try{await docRef(currentUser.uid,key).set({json:JSON.stringify(val),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});setStatus('Сохранено');}
+    catch(e){setStatus('Не удалось сохранить');}
+  },500);
+}
+
+// проекты
+const mkT=()=>({t:'',d:'',done:false});
+const newP=()=>Array.from({length:5},()=>({name:'',d:'',tasks:Array.from({length:5},mkT)}));
+const pcOf=p=>{const n=p.tasks.length,d=p.tasks.filter(t=>t.done).length;return{n,d,p:n?Math.round(d/n*100):0};};
+async function loadProjects(){
+  if(!currentUser||(P&&pUid===currentUser.uid))return;
+  const v=await loadDoc('projects',newP);if(!v)return;
+  P=v;pUid=currentUser.uid;renderProjects();
+}
+function renderProjects(){
+  if(!P)return;let n=0,d=0;
+  document.getElementById('pjList').innerHTML=P.map((p,i)=>{
+    const r=pcOf(p);n+=r.n;d+=r.d;
+    return `<div class="pj"><div class="pj-h">
+      <div class="pj-top"><input class="pi pj-name" placeholder="Проект ${i+1}" value="${esc2(p.name)}" oninput="P[${i}].name=this.value;saveDoc('projects',P)"><div class="pj-pct">${r.p}%</div></div>
+      <div class="sc-bar"><div class="sc-fill" style="width:${r.p}%"></div></div>
+      <div class="pj-meta"><span>${r.d}/${r.n} задач</span><span>дедлайн <input type="date" class="pd${isLate(p.d,r.p===100)?' late':''}" value="${p.d}" oninput="P[${i}].d=this.value;this.classList.toggle('late',isLate(this.value,${r.p===100}));saveDoc('projects',P)"></span></div></div>
+      ${p.tasks.map((t,j)=>`<div class="tk${t.done?' done':''}"><div class="cell${t.done?' done':''}" onclick="tTog(${i},${j})"></div><input class="pi" placeholder="задача ${j+1}" value="${esc2(t.t)}" oninput="P[${i}].tasks[${j}].t=this.value;saveDoc('projects',P)"><input type="date" class="pd${isLate(t.d,t.done)?' late':''}" value="${t.d}" oninput="P[${i}].tasks[${j}].d=this.value;this.classList.toggle('late',isLate(this.value,${t.done}));saveDoc('projects',P)"><button class="xb" onclick="tDel(${i},${j})">×</button></div>`).join('')}
+      <button class="addbtn" onclick="tAdd(${i})">+ добавить задачу</button></div>`;
+  }).join('');
+  const v=n?Math.round(d/n*100):0;
+  document.getElementById('pjTot').innerHTML=v+'<span class="u">%</span>';
+  document.getElementById('pjTotBar').style.width=v+'%';
+}
+function tTog(i,j){const t=P[i].tasks[j];t.done=!t.done;saveDoc('projects',P);renderProjects();}
+function tAdd(i){P[i].tasks.push(mkT());saveDoc('projects',P);renderProjects();}
+function tDel(i,j){P[i].tasks.splice(j,1);saveDoc('projects',P);renderProjects();}
+
+// цели на год
+const mkG=()=>({name:'',why:'',m:Array(12).fill(false)});
+const newG=()=>Array.from({length:6},mkG);
+async function loadGoals(){
+  if(!currentUser||(G&&gUid===currentUser.uid+gy))return;
+  const v=await loadDoc('goals_'+gy,newG);if(!v)return;
+  G=v;gUid=currentUser.uid+gy;renderGoals();
+}
+function goalYear(d){gy+=d;G=null;document.getElementById('gyLabel').textContent=gy;loadGoals();}
+function renderGoals(){
+  if(!G)return;
+  const now=new Date(),cy=now.getFullYear(),cm=now.getMonth();
+  document.getElementById('gyLabel').textContent=gy;
+  const tot=G.length*12,dn=G.reduce((a,g)=>a+g.m.filter(Boolean).length,0);
+  const v=tot?Math.round(dn/tot*100):0;
+  const el=gy<cy?100:gy>cy?0:Math.round((now-new Date(gy,0,1))/(new Date(gy+1,0,1)-new Date(gy,0,1))*100);
+  const card=(l,x,s)=>`<div class="sc"><div class="sc-lbl">${l}</div><div class="sc-val">${x}<span class="u">%</span></div><div class="sc-sub">${s}</div><div class="sc-bar"><div class="sc-fill" style="width:${x}%"></div></div></div>`;
+  document.getElementById('glStats').innerHTML=card('Выполнено',v,`${dn} из ${tot} отметок`)+card('Год прошёл',el,'где нужно быть сегодня');
+  document.getElementById('glList').innerHTML=G.map((g,i)=>{
+    const c=g.m.filter(Boolean).length;
+    return `<div class="pj"><div class="pj-h">
+      <div class="pj-top"><input class="pi pj-name" placeholder="Цель ${i+1}" value="${esc2(g.name)}" oninput="G[${i}].name=this.value;saveDoc('goals_'+gy,G)"><div class="pj-pct">${Math.round(c/12*100)}%</div></div>
+      <input class="pi" style="color:var(--t2);font-size:12px;" placeholder="как пойму, что получилось" value="${esc2(g.why)}" oninput="G[${i}].why=this.value;saveDoc('goals_'+gy,G)">
+      <div class="g-grid">${g.m.map((x,k)=>`<button class="gm${x?' on':''}${gy===cy&&k===cm?' now':''}" onclick="gTog(${i},${k})">${MS[k]}</button>`).join('')}</div>
+      <div class="pj-meta"><span>${c} из 12 месяцев</span><button class="xb" style="font-size:11px;" onclick="gDel(${i})">удалить</button></div></div></div>`;
+  }).join('');
+}
+function gTog(i,k){G[i].m[k]=!G[i].m[k];saveDoc('goals_'+gy,G);renderGoals();}
+function gDel(i){if(confirm('Удалить цель?')){G.splice(i,1);saveDoc('goals_'+gy,G);renderGoals();}}
+function addGoal(){if(!G)return;G.push(mkG());saveDoc('goals_'+gy,G);renderGoals();}
+
 
 init();
 </script>
