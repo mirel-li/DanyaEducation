@@ -184,6 +184,7 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 
 <div class="tabs">
   <div class="tab on" onclick="showTab('tracker',this)">Трекер</div>
+  <div class="tab" onclick="showTab('study',this)">Обучение</div>
   <div class="tab" onclick="showTab('summary',this)">Итоги</div>
 </div>
 
@@ -202,6 +203,18 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
         <div class="grid-scroll"><div class="grid" id="g-habits"></div></div>
       </div>
     </div>
+    <div class="sec"><div class="sec-lbl">Духовное</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-spirit"></div>
+        <div class="grid-scroll"><div class="grid" id="g-spirit"></div></div>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-lbl">Чтение</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-read"></div>
+        <div class="grid-scroll"><div class="grid" id="g-read"></div></div>
+      </div>
+    </div>
     <div class="sec"><div class="sec-lbl">Водный баланс</div>
       <div class="grid-wrap">
         <div class="grid-labels" id="lbl-water"></div>
@@ -214,15 +227,16 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
         <div class="grid-scroll"><div class="grid" id="g-diary"></div></div>
       </div>
     </div>
+  </div>
 
+  <div class="page" id="page-study">
     <div class="sec">
-      <div class="sec-lbl">Учебный план</div>
       <div style="margin-bottom:16px;">
         <div class="m-lbl">Тема месяца</div>
         <input class="m-input" id="themeInput" style="width:100%;max-width:320px;" placeholder="Например: Осень и урожай" oninput="saveTheme(this.value)">
       </div>
 
-      <div class="sec-lbl" style="margin-top:6px;">Предметы</div>
+      <div class="sec-lbl">Предметы</div>
       <div class="grid-wrap">
         <div class="grid-labels" id="lbl-subj"></div>
         <div class="grid-scroll"><div class="grid" id="g-subj"></div></div>
@@ -291,11 +305,16 @@ const HABITS = [
   {id:'workout', ic:'🏋️', lbl:'Тренировка'},
   {id:'selfdev', ic:'🌱', lbl:'Саморазвитие'},
 ];
+const SPIRIT = [
+  {id:'bible',    ic:'📖', lbl:'Чтение Библии'},
+  {id:'meditate', ic:'🧘', lbl:'Медитация'},
+];
 const SUBJ = [
-  {id:'subj_pdd', ic:'🚗', lbl:'ПДД'},
-  {id:'subj_yaz', ic:'🗣️', lbl:'Язык'},
-  {id:'subj_kal', ic:'✍️', lbl:'Каллиграфия'},
-  {id:'subj_int', ic:'🧩', lbl:'Интерактив'},
+  {id:'subj_pdd',  ic:'🚗', lbl:'ПДД'},
+  {id:'subj_yaz',  ic:'🗣️', lbl:'Язык'},
+  {id:'subj_kal',  ic:'✍️', lbl:'Каллиграфия'},
+  {id:'subj_int',  ic:'🧩', lbl:'Интерактив'},
+  {id:'subj_rech', ic:'💬', lbl:'Развитие речи'},
 ];
 const MOODS = ['😞','😕','😐','🙂','😊'];
 
@@ -435,6 +454,32 @@ function render(){
   });
   document.getElementById('g-habits').innerHTML=g;
 
+  // ── SPIRIT ──
+  let lblSp='<div class="grid-header-spacer"></div>';
+  SPIRIT.forEach(h=>{ lblSp+=`<div class="row-lbl"><span class="ic">${h.ic}</span>${h.lbl}</div>`; });
+  document.getElementById('lbl-spirit').innerHTML=lblSp;
+  g=dayRow();
+  SPIRIT.forEach(h=>{
+    g+='<div class="grid-row">';
+    for(let d=1;d<=dim;d++){
+      const f=fut(d)?' off':'';
+      g+=`<div class="cell ${D[`${h.id}_${d}`]?'done':''}${f}" onclick="tog('${h.id}',${d})"></div>`;
+    }
+    g+='</div>';
+  });
+  document.getElementById('g-spirit').innerHTML=g;
+
+  // ── READING (daily mark) ──
+  document.getElementById('lbl-read').innerHTML=
+    `<div class="grid-header-spacer"></div><div class="row-lbl"><span class="ic">📚</span>читал</div>`;
+  g=dayRow()+'<div class="grid-row">';
+  for(let d=1;d<=dim;d++){
+    const f=fut(d)?' off':'';
+    g+=`<div class="cell ${D[`read_${d}`]?'done':''}${f}" onclick="tog('read',${d})"></div>`;
+  }
+  g+='</div>';
+  document.getElementById('g-read').innerHTML=g;
+
   // ── WATER ──
   document.getElementById('lbl-water').innerHTML=
     `<div class="grid-header-spacer"></div>
@@ -505,21 +550,11 @@ function render(){
   // ── BOOKS ──
   let bH='';
   for(let idx=0;idx<5;idx++){
-    let bg=dayRow()+'<div class="grid-row">';
-    for(let d=1;d<=dim;d++){
-      const f=fut(d)?' off':'';
-      bg+=`<div class="cell ${D[`bookRead_${idx}_${d}`]?'done':''}${f}" onclick="tog('bookRead_${idx}',${d})"></div>`;
-    }
-    bg+='</div>';
     const hasNotes=D[`bookThoughts_${idx}`]||D[`bookDiary_${idx}`];
     const tVal=(D[`bookTitle_${idx}`]||'').replace(/"/g,'&quot;');
-    bH+=`<div class="book-block" style="margin-bottom:18px;">
-      <input class="m-input" style="width:100%;max-width:320px;" placeholder="Название книги ${idx+1}" value="${tVal}" oninput="saveBookTitle(${idx},this.value)">
-      <div class="grid-wrap" style="margin-top:2px;">
-        <div class="grid-labels"><div class="grid-header-spacer"></div><div class="row-lbl"><span class="ic">📖</span>чтение</div></div>
-        <div class="grid-scroll"><div class="grid">${bg}</div></div>
-      </div>
-      <button type="button" onclick="openBookNotes(${idx})" style="margin-top:8px;padding:6px 12px;font-size:11px;border-radius:5px;background:var(--s1);border:1px solid var(--b2);color:var(--t2);cursor:pointer;">Заметки${hasNotes?' ✓':''}</button>
+    bH+=`<div class="book-block" style="margin-bottom:12px;">
+      <input class="m-input" style="width:100%;max-width:320px;margin-bottom:6px;" placeholder="Название книги ${idx+1}" value="${tVal}" oninput="saveBookTitle(${idx},this.value)">
+      <button type="button" onclick="openBookNotes(${idx})" style="padding:6px 12px;font-size:11px;border-radius:5px;background:var(--s1);border:1px solid var(--b2);color:var(--t2);cursor:pointer;">Заметки${hasNotes?' ✓':''}</button>
     </div>`;
   }
   document.getElementById('booksWrap').innerHTML=bH;
@@ -657,6 +692,11 @@ function renderSummary(){
   const hc={};
   HABITS.forEach(h=>{let c=0;for(let d=1;d<=dim;d++)if(D[`${h.id}_${d}`])c++;hc[h.id]=c;});
 
+  const spc={};
+  SPIRIT.forEach(h=>{let c=0;for(let d=1;d<=dim;d++)if(D[`${h.id}_${d}`])c++;spc[h.id]=c;});
+
+  let readDays=0;for(let d=1;d<=dim;d++)if(D[`read_${d}`])readDays++;
+
   const sc2={};
   SUBJ.forEach(s=>{let c=0;for(let d=1;d<=dim;d++)if(D[`${s.id}_${d}`])c++;sc2[s.id]=c;});
 
@@ -682,6 +722,9 @@ function renderSummary(){
     {l:'Трезвость',v:hc.sober,u:'дней',s:`из ${active}`,pct:hc.sober/active*100},
     {l:'Тренировки',v:hc.workout,u:'раз',s:'за месяц',pct:hc.workout/20*100},
     {l:'Саморазвитие',v:hc.selfdev,u:'дней',s:`из ${active}`,pct:hc.selfdev/active*100},
+    {l:'Чтение Библии',v:spc.bible,u:'дней',s:`из ${active}`,pct:spc.bible/active*100},
+    {l:'Медитация',v:spc.meditate,u:'дней',s:`из ${active}`,pct:spc.meditate/active*100},
+    {l:'Чтение',v:readDays,u:'дней',s:`из ${active}`,pct:readDays/active*100},
     {l:'Вода · норма',v:wDays,u:'дней',s:`стаканов всего: ${wTot}`,pct:wDays/active*100},
     {l:'Настроение · средн.',v:mEmoji,u:mAvg?` ${mAvg}/5`:'',s:`${mCnt} оценок`,pct:mAvg/5*100},
     {l:'Записей в дневнике',v:noteDays,u:'дней',s:'',pct:noteDays/active*100},
@@ -689,6 +732,7 @@ function renderSummary(){
     {l:'Язык',v:sc2.subj_yaz,u:'дней',s:`из ${active}`,pct:sc2.subj_yaz/active*100},
     {l:'Каллиграфия',v:sc2.subj_kal,u:'дней',s:`из ${active}`,pct:sc2.subj_kal/active*100},
     {l:'Интерактив',v:sc2.subj_int,u:'дней',s:`из ${active}`,pct:sc2.subj_int/active*100},
+    {l:'Развитие речи',v:sc2.subj_rech,u:'дней',s:`из ${active}`,pct:sc2.subj_rech/active*100},
     {l:'Лекции',v:lecCount,u:'шт',s:`за месяц`,pct:lecCount/dim*100},
     {l:'Книги в работе',v:booksActive,u:'из 5',s:'',pct:booksActive/5*100},
   ];
@@ -719,6 +763,13 @@ function renderSummary(){
 • Тренировки: ${hc.workout} раз
 • Саморазвитие: ${hc.selfdev}/${active} дн.
 
+ДУХОВНОЕ
+• Чтение Библии: ${spc.bible}/${active} дн.
+• Медитация: ${spc.meditate}/${active} дн.
+
+ЧТЕНИЕ
+• Дней с чтением: ${readDays}/${active}
+
 ВОДА
 • Дней с нормой (≥8 ст.): ${wDays}/${active}
 • Всего стаканов: ${wTot}
@@ -734,6 +785,7 @@ function renderSummary(){
 • Язык: ${sc2.subj_yaz}/${active} дн.
 • Каллиграфия: ${sc2.subj_kal}/${active} дн.
 • Интерактив: ${sc2.subj_int}/${active} дн.
+• Развитие речи: ${sc2.subj_rech}/${active} дн.
 • Лекций записано: ${lecCount}
 • Книг в работе: ${booksActive}/5
 
