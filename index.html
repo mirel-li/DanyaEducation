@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Трекер · Даниил</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -195,6 +196,30 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 .plan-item .m-input{min-width:0;max-width:100%;}
 .plan-item input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;}
 @media (max-width:480px){.plan-item .row2{grid-template-columns:minmax(0,1fr);gap:0;}.plan-item .row2>div{margin-bottom:8px;}}
+.prof{display:flex;gap:4px;}
+.prof button.on{color:var(--gold)!important;border-color:var(--gold)!important;}
+.status{top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));}
+.hold{display:none;text-align:center;padding:56px 20px;border:1px solid var(--b1);background:var(--s1);border-radius:var(--r);}
+.hold b{display:block;font-weight:400;font-style:italic;font-size:28px;margin-bottom:8px;}
+.hold span{color:var(--t2);font-size:17px;}
+:root[data-prof="dasha"]{--bg:#ece3d3;--s1:#f5eee1;--s2:#e6dbc8;--b1:#d6c8b0;--b2:#bfae91;--t1:#2a231b;--t2:#6a5b48;--t3:#9b8b74;--gold:#8b5e3c;--gold-d:rgba(139,94,60,.12);--green:#6b7a55;--green-d:rgba(107,122,85,.16);--blue:#6f7f8c;--blue-d:rgba(111,127,140,.15);--red:#a4483c;--r:3px;}
+:root[data-prof="dasha"] *{font-family:'Cormorant Garamond',Georgia,serif;}
+:root[data-prof="dasha"] body{font-size:17px;}
+:root[data-prof="dasha"] .hdr{border-bottom:3px double var(--b2);}
+:root[data-prof="dasha"] .hdr-name{font-size:30px;font-style:italic;font-weight:400;letter-spacing:.01em;}
+:root[data-prof="dasha"] .hdr-month{font-size:15px;letter-spacing:.14em;}
+:root[data-prof="dasha"] .tab{font-size:14px;letter-spacing:.12em;font-weight:500;}
+:root[data-prof="dasha"] .sec-lbl,:root[data-prof="dasha"] .sc-lbl,:root[data-prof="dasha"] .m-lbl{font-size:13px;letter-spacing:.14em;}
+:root[data-prof="dasha"] .row-lbl,:root[data-prof="dasha"] .pj-meta,:root[data-prof="dasha"] .sc-sub,:root[data-prof="dasha"] .userbar,:root[data-prof="dasha"] .userbar button,:root[data-prof="dasha"] .status,:root[data-prof="dasha"] .export-txt{font-size:14px;}
+:root[data-prof="dasha"] .pi,:root[data-prof="dasha"] .m-input,:root[data-prof="dasha"] .pd,:root[data-prof="dasha"] .gm,:root[data-prof="dasha"] .pday,:root[data-prof="dasha"] .dow,:root[data-prof="dasha"] .addbtn,:root[data-prof="dasha"] .btn{font-size:16px;}
+:root[data-prof="dasha"] .pj-name{font-size:23px;font-style:italic;font-weight:400;}
+:root[data-prof="dasha"] .sc-val{font-size:36px;font-weight:300;}
+:root[data-prof="dasha"] .pj-pct{font-size:28px;font-weight:300;}
+:root[data-prof="dasha"] .cell,:root[data-prof="dasha"] .gm,:root[data-prof="dasha"] .pd,:root[data-prof="dasha"] .m-input,:root[data-prof="dasha"] .btn,:root[data-prof="dasha"] .addbtn,:root[data-prof="dasha"] .pday,:root[data-prof="dasha"] .modal{border-radius:2px;}
+:root[data-prof="dasha"] .cell.done{background:var(--gold-d);border-color:var(--gold);}
+:root[data-prof="dasha"] .cell.done::after{background:var(--gold);}
+:root[data-prof="dasha"] #page-tracker>.sec,:root[data-prof="dasha"] #page-study>.sec,:root[data-prof="dasha"] #page-summary>*:not(.hold){display:none;}
+:root[data-prof="dasha"] .hold{display:block;}
 </style>
 </head>
 <body>
@@ -225,6 +250,7 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 
 <div class="userbar" id="userBar">
   <span id="userEmail"></span>
+  <div class="prof"><button data-p="daniil" onclick="setProf('daniil')">Даниил</button><button data-p="dasha" onclick="setProf('dasha')">Даша</button></div>
   <button id="logoutBtn">Выйти</button>
 </div>
 
@@ -240,6 +266,7 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 <div class="main">
 
   <div class="page on" id="page-tracker">
+    <div class="hold"><b>здесь пока пусто</b><span>сюда добавим твои пункты — напиши, что хочешь отслеживать</span></div>
     <div class="sec"><div class="sec-lbl">Сон</div>
       <div class="grid-wrap">
         <div class="grid-labels" id="lbl-sleep"></div>
@@ -285,6 +312,7 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
   </div>
 
   <div class="page" id="page-study">
+    <div class="hold"><b>здесь пока пусто</b><span>сюда добавим твои пункты — напиши, что хочешь отслеживать</span></div>
     <div class="sec">
       <div style="margin-bottom:16px;">
         <div class="m-lbl">Тема месяца</div>
@@ -309,6 +337,7 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
   </div>
 
   <div class="page" id="page-summary">
+    <div class="hold"><b>здесь пока пусто</b><span>сюда добавим твои пункты — напиши, что хочешь отслеживать</span></div>
     <div class="stats" id="statsGrid"></div>
     <div class="export-box">
       <div class="export-lbl">Отчёт для нейросети</div>
@@ -407,7 +436,9 @@ let yr, mo, D = {}, ctx = null;
 let saveTimer=null;
 let selectedPlanDay=null;
 
-function storeKey(y,m){return `h_${y}_${m}`;}
+let prof='daniil';try{if(localStorage.getItem('prof')==='dasha')prof='dasha';}catch(e){}
+const pk=k=>prof==='dasha'?'d_'+k:k;
+function storeKey(y,m){return pk(`h_${y}_${m}`);}
 function docRef(uid,key){return db.collection('users').doc(uid).collection('months').doc(key);}
 function setStatus(t){const el=document.getElementById('status');el.style.display='';el.textContent=t;}
 
@@ -1022,11 +1053,11 @@ const esc2=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</
 const todayS=()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');};
 const isLate=(d,done)=>!!d&&!done&&d<todayS();
 async function loadDoc(key,make){
-  try{const s=await docRef(currentUser.uid,key).get();
+  try{const s=await docRef(currentUser.uid,pk(key)).get();
     return (s.exists&&s.data().json)?JSON.parse(s.data().json):make();
   }catch(e){setStatus('Не удалось загрузить');return null;}
 }
-function saveDoc(key,val){
+function saveDoc(key0,val){const key=pk(key0);
   setStatus('Сохранение…');clearTimeout(T[key]);
   T[key]=setTimeout(async()=>{
     try{await docRef(currentUser.uid,key).set({json:JSON.stringify(val),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});setStatus('Сохранено');}
@@ -1095,6 +1126,19 @@ function gMonth(i,k){G[i].month=G[i].month===k?-1:k;saveDoc('goals_'+gy,G);rende
 function gDel(i){if(confirm('Удалить цель?')){G.splice(i,1);saveDoc('goals_'+gy,G);renderGoals();}}
 function addGoal(){if(!G)return;G.push(mkG());saveDoc('goals_'+gy,G);renderGoals();}
 
+function applyProf(){
+  document.documentElement.dataset.prof=prof;
+  document.querySelector('.hdr-name').textContent=prof==='dasha'?'Даша':'ДАНИИЛ';
+  document.querySelectorAll('.prof button').forEach(b=>b.classList.toggle('on',b.dataset.p===prof));
+}
+async function setProf(p){
+  if(p===prof)return;
+  if(document.getElementById('status').textContent==='Сохранение…'){clearTimeout(saveTimer);await doSave();}
+  prof=p;try{localStorage.setItem('prof',p);}catch(e){}
+  P=null;G=null;selectedPlanDay=null;applyProf();
+  await loadMonth();loadProjects();loadGoals();
+}
+applyProf();
 init();
 </script>
 </body>
