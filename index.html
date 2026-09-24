@@ -611,6 +611,87 @@ function render(){
     </div>`;
   }
   document.getElementById('booksWrap').innerHTML=bH;
+
+  renderPlanner();
+}
+
+// ── PLANNER ──
+const DOW=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+function ensurePlanDay(d){
+  if(!D.plan) D.plan={};
+  if(!D.plan[d] || !D.plan[d].length) D.plan[d]=[{time:'',location:'',text:''}];
+  return D.plan[d];
+}
+function planDayHasContent(d){
+  const v=(D.plan&&D.plan[d])||[];
+  return v.some(it=>it&&((it.time||'').trim()||(it.location||'').trim()||(it.text||'').trim()));
+}
+function renderPlanGrid(){
+  const n=new Date();
+  const isCur=yr===n.getFullYear()&&mo===n.getMonth();
+  const dim=new Date(yr,mo+1,0).getDate();
+  const first=new Date(yr,mo,1);
+  const startOffset=(first.getDay()+6)%7;
+  let h='';
+  DOW.forEach(dw=>{ h+=`<div class="dow">${dw}</div>`; });
+  for(let i=0;i<startOffset;i++) h+='<div class="pday empty"></div>';
+  for(let d=1;d<=dim;d++){
+    const isToday=isCur&&d===n.getDate();
+    const hasContent=planDayHasContent(d);
+    const isSel=selectedPlanDay===d;
+    h+=`<div class="pday${isToday?' today':''}${isSel?' sel':''}" onclick="selectPlanDay(${d})">
+      <div>${d}</div>${hasContent?'<div class="dot"></div>':''}
+    </div>`;
+  }
+  document.getElementById('planGrid').innerHTML=h;
+}
+function renderPlanEditor(d){
+  const area=document.getElementById('planEditor');
+  const items=ensurePlanDay(d);
+  let h='';
+  items.forEach((it,idx)=>{
+    h+=`<div class="plan-item">
+      <div class="m-lbl">Что делать</div>
+      <textarea class="m-input" style="min-height:44px;margin-bottom:8px;width:100%;" placeholder="Название задачи…" oninput="updatePlanField(${d},${idx},'text',this.value)">${it.text||''}</textarea>
+      <div class="row2">
+        <div>
+          <div class="m-lbl">Время</div>
+          <input class="m-input" type="time" style="margin-bottom:0;width:100%;" value="${it.time||''}" oninput="updatePlanField(${d},${idx},'time',this.value)">
+        </div>
+        <div>
+          <div class="m-lbl">Локация</div>
+          <input class="m-input" type="text" style="margin-bottom:0;width:100%;" placeholder="Где" value="${(it.location||'').replace(/"/g,'&quot;')}" oninput="updatePlanField(${d},${idx},'location',this.value)">
+        </div>
+      </div>
+    </div>`;
+  });
+  h+=`<button type="button" class="addbtn" onclick="addPlanItem(${d})">+ добавить пункт</button>
+  <div style="font-size:11px;color:var(--t3);margin-top:8px;">Сохраняется автоматически.</div>`;
+  area.innerHTML=h;
+}
+function renderPlanner(){
+  renderPlanGrid();
+  const dim=new Date(yr,mo+1,0).getDate();
+  if(selectedPlanDay&&selectedPlanDay<=dim){
+    document.getElementById('planSelLabel').textContent=selectedPlanDay+' '+MO[mo].toLowerCase();
+    renderPlanEditor(selectedPlanDay);
+  } else {
+    document.getElementById('planSelLabel').textContent='Выберите день';
+    document.getElementById('planEditor').innerHTML='<p style="color:var(--t3);font-size:12px;">Нажмите на дату выше, чтобы добавить заметку.</p>';
+  }
+}
+function selectPlanDay(d){ selectedPlanDay=d; renderPlanner(); }
+function updatePlanField(d,idx,field,val){
+  const items=ensurePlanDay(d);
+  items[idx][field]=val;
+  save();
+  renderPlanGrid();
+}
+function addPlanItem(d){
+  const items=ensurePlanDay(d);
+  items.push({time:'',location:'',text:''});
+  save();
+  renderPlanEditor(d);
 }
 
 // ── HELPERS ──
