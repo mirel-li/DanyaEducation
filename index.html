@@ -203,6 +203,12 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
         <div class="grid-scroll"><div class="grid" id="g-habits"></div></div>
       </div>
     </div>
+    <div class="sec"><div class="sec-lbl">АН</div>
+      <div class="grid-wrap">
+        <div class="grid-labels" id="lbl-an"></div>
+        <div class="grid-scroll"><div class="grid" id="g-an"></div></div>
+      </div>
+    </div>
     <div class="sec"><div class="sec-lbl">Духовное</div>
       <div class="grid-wrap">
         <div class="grid-labels" id="lbl-spirit"></div>
@@ -308,6 +314,11 @@ const HABITS = [
 const SPIRIT = [
   {id:'bible',    ic:'📖', lbl:'Чтение Библии'},
   {id:'meditate', ic:'🧘', lbl:'Медитация'},
+];
+const AN = [
+  {id:'an_group', ic:'🤝', lbl:'Группа'},
+  {id:'an_book',  ic:'📘', lbl:'Чтение книги'},
+  {id:'an_steps', ic:'🔢', lbl:'12 шагов'},
 ];
 const SUBJ = [
   {id:'subj_pdd',  ic:'🚗', lbl:'ПДД'},
@@ -453,6 +464,21 @@ function render(){
     g+='</div>';
   });
   document.getElementById('g-habits').innerHTML=g;
+
+  // ── AN ──
+  let lblAn='<div class="grid-header-spacer"></div>';
+  AN.forEach(h=>{ lblAn+=`<div class="row-lbl"><span class="ic">${h.ic}</span>${h.lbl}</div>`; });
+  document.getElementById('lbl-an').innerHTML=lblAn;
+  g=dayRow();
+  AN.forEach(h=>{
+    g+='<div class="grid-row">';
+    for(let d=1;d<=dim;d++){
+      const f=fut(d)?' off':'';
+      g+=`<div class="cell ${D[`${h.id}_${d}`]?'done':''}${f}" onclick="tog('${h.id}',${d})"></div>`;
+    }
+    g+='</div>';
+  });
+  document.getElementById('g-an').innerHTML=g;
 
   // ── SPIRIT ──
   let lblSp='<div class="grid-header-spacer"></div>';
@@ -692,6 +718,9 @@ function renderSummary(){
   const hc={};
   HABITS.forEach(h=>{let c=0;for(let d=1;d<=dim;d++)if(D[`${h.id}_${d}`])c++;hc[h.id]=c;});
 
+  const anc={};
+  AN.forEach(h=>{let c=0;for(let d=1;d<=dim;d++)if(D[`${h.id}_${d}`])c++;anc[h.id]=c;});
+
   const spc={};
   SPIRIT.forEach(h=>{let c=0;for(let d=1;d<=dim;d++)if(D[`${h.id}_${d}`])c++;spc[h.id]=c;});
 
@@ -722,6 +751,9 @@ function renderSummary(){
     {l:'Трезвость',v:hc.sober,u:'дней',s:`из ${active}`,pct:hc.sober/active*100},
     {l:'Тренировки',v:hc.workout,u:'раз',s:'за месяц',pct:hc.workout/20*100},
     {l:'Саморазвитие',v:hc.selfdev,u:'дней',s:`из ${active}`,pct:hc.selfdev/active*100},
+    {l:'АН · группа',v:anc.an_group,u:'дней',s:`из ${active}`,pct:anc.an_group/active*100},
+    {l:'АН · чтение книги',v:anc.an_book,u:'дней',s:`из ${active}`,pct:anc.an_book/active*100},
+    {l:'АН · 12 шагов',v:anc.an_steps,u:'дней',s:`из ${active}`,pct:anc.an_steps/active*100},
     {l:'Чтение Библии',v:spc.bible,u:'дней',s:`из ${active}`,pct:spc.bible/active*100},
     {l:'Медитация',v:spc.meditate,u:'дней',s:`из ${active}`,pct:spc.meditate/active*100},
     {l:'Чтение',v:readDays,u:'дней',s:`из ${active}`,pct:readDays/active*100},
@@ -762,6 +794,11 @@ function renderSummary(){
 • Трезвость: ${hc.sober}/${active} дн.
 • Тренировки: ${hc.workout} раз
 • Саморазвитие: ${hc.selfdev}/${active} дн.
+
+АН
+• Группа: ${anc.an_group}/${active} дн.
+• Чтение книги: ${anc.an_book}/${active} дн.
+• 12 шагов: ${anc.an_steps}/${active} дн.
 
 ДУХОВНОЕ
 • Чтение Библии: ${spc.bible}/${active} дн.
