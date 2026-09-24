@@ -202,7 +202,6 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
 .hold b{display:block;font-weight:400;font-style:italic;font-size:28px;margin-bottom:8px;}
 .hold span{color:var(--t2);font-size:17px;}
 :root[data-prof="dasha"]{--bg:#fdf3f5;--s1:#ffffff;--s2:#f8e9ed;--b1:#efdde2;--b2:#e2c9d0;--t1:#1a1a1a;--t2:#666;--t3:#999;}
-:root[data-prof="dasha"] #page-summary>*:not(.hold){display:none;}
 .ds-only{display:none;}
 :root[data-prof="dasha"] .ds-only{display:block;}
 :root[data-prof="dasha"] .dn-only{display:none;}
@@ -329,7 +328,6 @@ textarea.m-input{resize:vertical;min-height:80px;font-family:'Inter',sans-serif;
   </div>
 
   <div class="page" id="page-summary">
-    <div class="hold"><b>здесь пока пусто</b><span>сюда добавим твои пункты — напиши, что хочешь отслеживать</span></div>
     <div class="stats" id="statsGrid"></div>
     <div class="export-box">
       <div class="export-lbl">Отчёт для нейросети</div>
@@ -920,6 +918,7 @@ function delEntry(){
 
 // ── SUMMARY ──
 function renderSummary(){
+  if(prof==='dasha'){renderSummaryDasha();return;}
   const n=new Date();
   const isCur=yr===n.getFullYear()&&mo===n.getMonth();
   const dim=new Date(yr,mo+1,0).getDate();
@@ -1045,6 +1044,91 @@ function renderSummary(){
 
 ---
 Запрос: Проанализируй данные трекера привычек и учебного плана Даниила за ${MO[mo]} ${yr}. Выяви закономерности между сном, активностью, учёбой и настроением. Укажи сильные стороны и зоны роста. Дай конкретные рекомендации на следующий месяц.`;
+}
+
+function renderSummaryDasha(){
+  const n=new Date(),isCur=yr===n.getFullYear()&&mo===n.getMonth();
+  const dim=new Date(yr,mo+1,0).getDate(),active=isCur?n.getDate():dim;
+  const cnt=id=>{let c=0;for(let d=1;d<=dim;d++)if(D[`${id}_${d}`])c++;return c;};
+  let sT=0,sC=0,sG=0;
+  for(let d=1;d<=dim;d++){const h=sleepH(D[`sd_${d}`],D[`su_${d}`]);if(h>0){sT+=h;sC++;if(h>=7)sG++;}}
+  const sleepAvg=sC?Math.round(sT/sC*10)/10:0;
+  const hc={};DA_HABITS.forEach(h=>hc[h.id]=cnt(h.id));
+  const sc2={};DA_SUBJ.forEach(s=>sc2[s.id]=cnt(s.id));
+  let okDays=0,fast=0,kSum=0,kCnt=0;
+  for(let d=1;d<=dim;d++){if(D[`nok_${d}`])okDays++;if(D[`nf_${d}`])fast++;const k=D[`nk_${d}`];if(k){kSum+=k;kCnt++;}}
+  const kAvg=kCnt?Math.round(kSum/kCnt):0;
+  const readDays=cnt('read');
+  let wDays=0,wTot=0;for(let d=1;d<=dim;d++){const c=D[`w_${d}`]||0;wTot+=c;if(c>=8)wDays++;}
+  const mMap={'😞':1,'😕':2,'😐':3,'🙂':4,'😊':5};
+  let mTot=0,mCnt=0,noteDays=0;const mDist={1:0,2:0,3:0,4:0,5:0};
+  for(let d=1;d<=dim;d++){const m=D[`dm_${d}`];if(m&&mMap[m]){mTot+=mMap[m];mCnt++;mDist[mMap[m]]++;}if(D[`dn_${d}`])noteDays++;}
+  const mAvg=mCnt?Math.round(mTot/mCnt*10)/10:0;
+  const mEmoji=mAvg>=4.5?'😊':mAvg>=3.5?'🙂':mAvg>=2.5?'😐':mAvg>0?'😕':'—';
+  let lec=0;for(let d=1;d<=dim;d++)if(D[`lecTitle_${d}`]||D[`lecThoughts_${d}`])lec++;
+  let books=0;for(let i=0;i<5;i++)if(D[`bookTitle_${i}`])books++;
+  let courses=0;for(let i=0;i<2;i++)if(D[`courseTitle_${i}`])courses++;
+  const pc=(v,t)=>t?v/t*100:0;
+  const cards=[
+    {l:'Сон · среднее',v:sleepAvg||'—',u:sleepAvg?'ч':'',s:`${sG} дней ≥7ч`,pct:Math.min(100,sleepAvg/9*100)},
+    ...DA_HABITS.map(h=>({l:h.lbl,v:hc[h.id],u:'дней',s:`из ${active}`,pct:pc(hc[h.id],active)})),
+    {l:'Питание · в норме',v:okDays,u:'дней',s:`из ${active}`,pct:pc(okDays,active)},
+    {l:'Калории · средн.',v:kAvg||'—',u:kAvg?'ккал':'',s:`${kCnt} дней с записью`,pct:0},
+    {l:'Фастфуд',v:fast,u:'дней',s:`из ${active}`,pct:pc(fast,active)},
+    {l:'Чтение',v:readDays,u:'дней',s:`из ${active}`,pct:pc(readDays,active)},
+    {l:'Вода · норма',v:wDays,u:'дней',s:`стаканов всего: ${wTot}`,pct:pc(wDays,active)},
+    {l:'Настроение · средн.',v:mEmoji,u:mAvg?` ${mAvg}/5`:'',s:`${mCnt} оценок`,pct:mAvg/5*100},
+    {l:'Записей в дневнике',v:noteDays,u:'дней',s:'',pct:pc(noteDays,active)},
+    ...DA_SUBJ.map(x=>({l:x.lbl,v:sc2[x.id],u:'дней',s:`из ${active}`,pct:pc(sc2[x.id],active)})),
+    {l:'Лекции',v:lec,u:'шт',s:'за месяц',pct:pc(lec,dim)},
+    {l:'Книги в работе',v:books,u:'из 5',s:'',pct:pc(books,5)},
+    {l:'Курсы в работе',v:courses,u:'из 2',s:'',pct:pc(courses,2)},
+  ];
+  document.getElementById('statsGrid').innerHTML=cards.map(c=>`
+    <div class="sc"><div class="sc-lbl">${c.l}</div>
+      <div class="sc-val">${c.v}<span class="u">${c.u}</span></div>
+      <div class="sc-sub">${c.s}</div>
+      <div class="sc-bar"><div class="sc-fill" style="width:${Math.min(100,Math.max(0,c.pct||0))}%"></div></div></div>`).join('');
+  const mNames=['очень плохо','плохо','нейтрально','хорошо','отлично'];
+  const mDistStr=Object.entries(mDist).map(([k,v])=>`${mNames[k-1]}: ${v} дн.`).join(', ');
+  document.getElementById('exportTxt').textContent=
+`=== ОТЧЁТ ДАШИ · ${MO[mo].toUpperCase()} ${yr} ===
+Дней в отслеживании: ${active} из ${dim}
+
+СОН
+• Среднее: ${sleepAvg||'н/д'} ч
+• Дней с нормальным сном (≥7ч): ${sG}
+• Всего записей: ${sC}
+
+ПРИВЫЧКИ
+${DA_HABITS.map(h=>`• ${h.lbl}: ${hc[h.id]}/${active} дн.`).join('\n')}
+
+ПИТАНИЕ
+• Дней в норме по калориям: ${okDays}/${active}
+• Средние калории: ${kAvg||'н/д'}${kAvg?' ккал':''} (дней с записью: ${kCnt})
+• Дней с фастфудом: ${fast}
+
+ЧТЕНИЕ
+• Дней с чтением: ${readDays}/${active}
+
+ВОДА
+• Дней с нормой (≥8 ст.): ${wDays}/${active}
+• Всего стаканов: ${wTot}
+
+ДНЕВНИК
+• Среднее настроение: ${mAvg||'н/д'}/5
+• Распределение: ${mDistStr}
+• Дней с записями: ${noteDays}
+
+УЧЁБА
+• Тема месяца: ${D.themeVal||'не указана'}
+${DA_SUBJ.map(x=>`• ${x.lbl}: ${sc2[x.id]}/${active} дн.`).join('\n')}
+• Лекций записано: ${lec}
+• Книг в работе: ${books}/5
+• Курсов в работе: ${courses}/2
+
+---
+Запрос: Проанализируй данные трекера привычек и учёбы Даши за ${MO[mo]} ${yr}. Выяви закономерности между сном, питанием, активностью, учёбой и настроением. Укажи сильные стороны и зоны роста. Дай конкретные рекомендации на следующий месяц.`;
 }
 
 function copyExport(){
